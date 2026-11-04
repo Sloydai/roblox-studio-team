@@ -206,8 +206,29 @@ def cmd_run(args):
     if have < total:
         sys.exit(f"Plan needs {total} credits, balance is {have}. Top up at https://api-dashboard.sloyd.ai.")
     os.makedirs(os.path.join(args.out, "raw"), exist_ok=True)
-    pending, running, done = plan_jobs(plan), {}, []
+    # Submitted jobIds are saved immediately, so an interrupted run resumes without paying twice.
+    state_path = os.path.join(args.out, "run_state.json")
+    state = json.load(open(state_path)) if os.path.isfile(state_path) else {}
+
+    def save_state():
+        with open(state_path, "w") as fh:
+            json.dump(state, fh, indent=2)
+
+    pending, running, done = [], {}, []
+    for j in plan_jobs(plan):
+        if j["name"] in state:
+            j["jobId"] = state[j["name"]]
+            running[j["jobId"]] = j
+            print(f"resuming {j['name']} -> {j['jobId']}", flush=True)
+        else:
+            pending.append(j)
     waiting_variants = variant_jobs(plan, {})
+    for v in list(waiting_variants):
+        if v["name"] in state:
+            v["jobId"] = state[v["name"]]
+            running[v["jobId"]] = v
+            waiting_variants.remove(v)
+            print(f"resuming {v['name']} -> {v['jobId']}", flush=True)
     while pending or running or waiting_variants:
         # A variant becomes submittable once its base model has succeeded.
         ok_ids = {j["name"]: j["jobId"] for j in done if j.get("status") in ("success", "completed")}
@@ -225,6 +246,8 @@ def cmd_run(args):
         while pending and len(running) < MAX_CONCURRENT:
             j = pending.pop(0)
             j["jobId"] = create(j["kind"], j["body"])
+            state[j["name"]] = j["jobId"]
+            save_state()
             running[j["jobId"]] = j
             print(f"submitted {j['name']} -> {j['jobId']}", flush=True)
         time.sleep(10)
