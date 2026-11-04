@@ -1,0 +1,242 @@
+{
+  "ok": true,
+  "name": "CandyShopStand",
+  "input": "/projects/sandbox/roblox-studio-team/examples/candy-climb/roblox-assets/raw/CandyShopStand.glb",
+  "before": {
+    "meshes": [
+      {
+        "name": "input",
+        "open_edges": 0,
+        "triangles": 8000,
+        "vertices": 6604,
+        "materials": 1,
+        "textures": [
+          {
+            "name": "base_color_6fde8483-0651-4880-a4df-c8c5af5e9717",
+            "size": [
+              1024,
+              1024
+            ]
+          },
+          {
+            "name": "input_metallic-input_roughness",
+            "size": [
+              1024,
+              1024
+            ]
+          },
+          {
+            "name": "normal_6fde8483-0651-4880-a4df-c8c5af5e9717",
+            "size": [
+              1024,
+              1024
+            ]
+          }
+        ]
+      }
+    ],
+    "total_triangles": 8000,
+    "size_studs": {
+      "x": 1.2,
+      "y": 1.129,
+      "z": 1.068
+    }
+  },
+  "after": {
+    "meshes": [
+      {
+        "name": "input",
+        "open_edges": 0,
+        "triangles": 8000,
+        "vertices": 6604,
+        "materials": 1,
+        "textures": [
+          {
+            "name": "base_color_6fde8483-0651-4880-a4df-c8c5af5e9717",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "name": "input_metallic-input_roughness",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "name": "normal_6fde8483-0651-4880-a4df-c8c5af5e9717",
+            "size": [
+              512,
+              512
+            ]
+          }
+        ]
+      }
+    ],
+    "total_triangles": 8000,
+    "size_studs": {
+      "x": 9.569,
+      "y": 9.0,
+      "z": 8.518
+    }
+  },
+  "decimated": [],
+  "scale_factor": 7.974286,
+  "texture_max": 512,
+  "textures_downscaled": [
+    {
+      "name": "base_color_6fde8483-0651-4880-a4df-c8c5af5e9717",
+      "from": [
+        1024,
+        1024
+      ],
+      "to": [
+        512,
+        512
+      ]
+    },
+    {
+      "name": "input_metallic-input_roughness",
+      "from": [
+        1024,
+        1024
+      ],
+      "to": [
+        512,
+        512
+      ]
+    },
+    {
+      "name": "normal_6fde8483-0651-4880-a4df-c8c5af5e9717",
+      "from": [
+        1024,
+        1024
+      ],
+      "to": [
+        512,
+        512
+      ]
+    }
+  ],
+  "textures_written": [
+    "/projects/sandbox/roblox-studio-team/examples/candy-climb/roblox-assets/export/CandyShopStand/textures/CandyShopStand_0.png",
+    "/projects/sandbox/roblox-studio-team/examples/candy-climb/roblox-assets/export/CandyShopStand/textures/CandyShopStand_1.png",
+    "/projects/sandbox/roblox-studio-team/examples/candy-climb/roblox-assets/export/CandyShopStand/textures/CandyShopStand_2.png"
+  ],
+  "outputs": {
+    "fbx": "/projects/sandbox/roblox-studio-team/examples/candy-climb/roblox-assets/export/CandyShopStand/CandyShopStand.fbx",
+    "obj": "/projects/sandbox/roblox-studio-team/examples/candy-climb/roblox-assets/export/CandyShopStand/CandyShopStand.obj",
+    "glb": "/projects/sandbox/roblox-studio-team/examples/candy-climb/roblox-assets/export/CandyShopStand/CandyShopStand.glb"
+  },
+  "verification": {
+    "fbx": {
+      "ok": true,
+      "total_triangles": 8000,
+      "open_edges": 0,
+      "meshes": [
+        {
+          "name": "input",
+          "triangles": 8000,
+          "textures": [
+            {
+              "name": "base_color_6fde8483-0651-4880-a4df-c8c5af5e9717",
+              "size": [
+                512,
+                512
+              ]
+            },
+            {
+              "name": "normal_6fde8483-0651-4880-a4df-c8c5af5e9717",
+              "size": [
+                512,
+                512
+              ]
+            }
+          ]
+        }
+      ],
+      "size_studs": {
+        "x": 9.569,
+        "y": 9.0,
+        "z": 8.518
+      },
+      "problems": []
+    },
+    "obj": {
+      "ok": true,
+      "total_triangles": 8000,
+      "open_edges": 0,
+      "meshes": [
+        {
+          "name": "input",
+          "triangles": 8000,
+          "textures": [
+            {
+              "name": "CandyShopStand_0.png",
+              "size": [
+                512,
+                512
+              ]
+            },
+            {
+              "name": "CandyShopStand_2.png",
+              "size": [
+                512,
+                512
+              ]
+            }
+          ]
+        }
+      ],
+      "size_studs": {
+        "x": 9.569,
+        "y": 9.0,
+        "z": 8.518
+      },
+      "problems": []
+    },
+    "glb": {
+      "ok": true,
+      "total_triangles": 8000,
+      "open_edges": 0,
+      "meshes": [
+        {
+          "name": "input",
+          "triangles": 8000,
+          "textures": [
+            {
+              "name": "CandyShopStand_0",
+              "size": [
+                512,
+                512
+              ]
+            },
+            {
+              "name": "CandyShopStand_1",
+              "size": [
+                512,
+                512
+              ]
+            },
+            {
+              "name": "CandyShopStand_2",
+              "size": [
+                512,
+                512
+              ]
+            }
+          ]
+        }
+      ],
+      "size_studs": {
+        "x": 9.569,
+        "y": 9.0,
+        "z": 8.518
+      },
+      "problems": []
+    }
+  },
+  "roblox_ready": true
+}

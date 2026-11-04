@@ -1,6 +1,6 @@
 # Launch tweet: Roblox Studio Team
 
-Status: copy is final. **Media must come from the real Candy Climb run** (`examples/candy-climb/`). Every image and clip below is either a real generation by this team or real footage of the built place. No mockups.
+Status: copy is final. All media comes from the real Candy Climb run on 2026-11-04 (`examples/candy-climb/`, 11 Sloyd jobs, 245 credits). No mockups. Only the Studio gameplay recording is still to capture.
 
 ## Main post (hook)
 
@@ -39,13 +39,13 @@ roblox-studio/
 
 Media: the folder tree as an image, or a screenshot of the skills list in Claude Code.
 
-**3/** The boring parts are done right. Each mesh is checked against the 20,000-triangle limit, scaled in studs, given a ground pivot, sized texture and collision fidelity, then re-imported to verify. [raw] → [final] triangles, no holes. (Fill both numbers from the asset's real `report.json`.)
+**3/** The boring parts are done right. Every asset gets a triangle budget up front (784 for the candy, 12k for the cake, never over Roblox's 20k), is scaled to studs, gets a ground pivot, gets textures sized for its studs (2048 → 256 px on pickups), and is re-imported to verify. 10/10 Studio-ready on the first run.
 
-Media: before/after render of one real Candy Climb asset with the triangle counts (`roblox-assets/previews/`).
+Media: `examples/candy-climb/roblox-assets/previews/props_sheet.png` with each asset's triangle count as a caption.
 
 **4/** Monetization built in: one backpack, three retextured skins, coin prices, plus Robux coin packs. Purchases are validated on the server and saved in DataStores.
 
-Media: 4-up grid of the real backpack skins (base + 3 retextures).
+Media: `examples/candy-climb/roblox-assets/previews/skins_sheet.png` (Classic, Mint 15, Choco 30, Galaxy 60).
 
 **5/** Install:
 
@@ -77,10 +77,11 @@ Recording notes:
 - Use **Test → Device → phone** for one Play-mode cut, since most Roblox players are on phones.
 - Keep the Claude Code terminal font large (≥18 pt) for the 9:16 crop.
 
-## Media checklist (fill from the real run)
+## Media checklist
 
-- [ ] `examples/candy-climb/roblox-assets/previews/*.png` (7 props + 3 skins)
-- [ ] before/after triangle render for post 3
-- [ ] `examples/candy-climb/roblox-assets/sky/preview_cross.png`
-- [ ] Studio Play-mode recording (shot 8)
-- [ ] credits actually spent (from balance before and after)
+- [x] `examples/candy-climb/roblox-assets/previews/*.png`: 7 props + 3 skins, plus `props_sheet.png` and `skins_sheet.png`
+- [x] Triangle counts per asset: `examples/candy-climb/roblox-assets/export/*/*.report.json`
+- [x] `examples/candy-climb/roblox-assets/sky/preview_cross.png`
+- [x] Built place: `examples/candy-climb/roblox-game/SloydGame.rbxlx`
+- [x] Credits spent: 245 (balance 415 → 170)
+- [ ] Studio import + Play-mode recording (shots 7–8), needs Roblox Studio on Windows or macOS

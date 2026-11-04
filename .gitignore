@@ -10,3 +10,5 @@ __pycache__/
 !examples/**/*.rbxlx
 sourcemap.json
 .DS_Store
+# Raw Sloyd downloads (re-fetchable from jobId; export/ holds the Roblox-ready files)
+examples/**/roblox-assets/raw/

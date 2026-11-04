@@ -1,0 +1,20 @@
+{
+  "source": "cubemapFaceUrls",
+  "faceSize": 1024,
+  "files": {
+    "SkyboxRt": "SkyboxRt.png",
+    "SkyboxLf": "SkyboxLf.png",
+    "SkyboxUp": "SkyboxUp.png",
+    "SkyboxDn": "SkyboxDn.png",
+    "SkyboxFt": "SkyboxFt.png",
+    "SkyboxBk": "SkyboxBk.png"
+  },
+  "assetIds": {
+    "SkyboxRt": null,
+    "SkyboxLf": null,
+    "SkyboxUp": null,
+    "SkyboxDn": null,
+    "SkyboxFt": null,
+    "SkyboxBk": null
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "jobId": "n0bbe2c3",
+  "status": "success",
+  "outputs": {
+    "cubemapFaceUrls": [
+      "https://storage.googleapis.com/ai-services-quality/panorama/4ab32e96-ed6a-4602-9bb0-1216ea66f49a_cxpos.webp",
+      "https://storage.googleapis.com/ai-services-quality/panorama/4ab32e96-ed6a-4602-9bb0-1216ea66f49a_cxneg.webp",
+      "https://storage.googleapis.com/ai-services-quality/jobs/n0bbe2c3_fixed_cypos.webp",
+      "https://storage.googleapis.com/ai-services-quality/jobs/n0bbe2c3_fixed_cyneg.webp",
+      "https://storage.googleapis.com/ai-services-quality/panorama/4ab32e96-ed6a-4602-9bb0-1216ea66f49a_czpos.webp",
+      "https://storage.googleapis.com/ai-services-quality/panorama/4ab32e96-ed6a-4602-9bb0-1216ea66f49a_czneg.webp"
+    ],
+    "panoramaUrl": "https://storage.googleapis.com/ai-services-quality/jobs/n0bbe2c3_panorama.webp"
+  }
+}
