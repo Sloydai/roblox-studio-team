@@ -1,0 +1,13 @@
+# Secrets
+.env
+.env.*
+*.secret
+# Python
+__pycache__/
+.venv/
+# Generated working output
+roblox-project/
+*.rbxl
+*.rbxlx
+!examples/**/*.rbxlx
+.DS_Store
