@@ -1,13 +1,12 @@
 # Secrets
 .env
 .env.*
-*.secret
 # Python
 __pycache__/
 .venv/
-# Generated working output
-roblox-project/
+# Rojo build outputs
 *.rbxl
 *.rbxlx
 !examples/**/*.rbxlx
+sourcemap.json
 .DS_Store

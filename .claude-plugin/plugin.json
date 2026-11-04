@@ -1,0 +1,15 @@
+{
+  "name": "roblox-studio",
+  "version": "0.1.0",
+  "description": "Roblox Studio Team: seven Claude skills that turn a game idea into a playable Roblox place with custom Sloyd-generated 3D assets, shop skins and a skybox.",
+  "author": {
+    "name": "Sloyd",
+    "url": "https://www.sloyd.ai"
+  },
+  "homepage": "https://github.com/Sloydai/roblox-studio-team",
+  "repository": "https://github.com/Sloydai/roblox-studio-team",
+  "license": "MIT",
+  "icon": ".claude-plugin/icon.png",
+  "privacyPolicyUrl": "https://www.sloyd.ai/privacy-policy",
+  "keywords": ["roblox", "roblox-studio", "luau", "rojo", "3d", "game-assets", "sloyd", "obby", "tycoon"]
+}
