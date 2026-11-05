@@ -1,0 +1,1159 @@
+<roblox version="4">
+  <Item class="Lighting" referent="0">
+    <Properties>
+      <string name="Name">Lighting</string>
+      <float name="Brightness">2.5</float>
+      <float name="ClockTime">14.5</float>
+      <float name="EnvironmentDiffuseScale">1</float>
+      <float name="EnvironmentSpecularScale">1</float>
+      <token name="Technology">4</token>
+    </Properties>
+  </Item>
+  <Item class="ReplicatedStorage" referent="1">
+    <Properties>
+      <string name="Name">ReplicatedStorage</string>
+    </Properties>
+    <Item class="Folder" referent="2">
+      <Properties>
+        <string name="Name">Assets</string>
+      </Properties>
+    </Item>
+    <Item class="Folder" referent="3">
+      <Properties>
+        <string name="Name">Shared</string>
+      </Properties>
+      <Item class="ModuleScript" referent="4">
+        <Properties>
+          <string name="Name">AssetLibrary</string>
+          <string name="Source"><![CDATA[--!strict
+-- Spawns assets by name. Uses the imported model in ReplicatedStorage.Assets when it
+-- exists, otherwise a placeholder block, so the game runs before any import.
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Config = require(script.Parent.GameConfig)
+
+local AssetLibrary = {}
+
+local function assetsFolder(): Folder?
+	return ReplicatedStorage:FindFirstChild("Assets") :: Folder?
+end
+
+function AssetLibrary.isImported(name: string): boolean
+	local folder = assetsFolder()
+	return folder ~= nil and folder:FindFirstChild(name) ~= nil
+end
+
+local function bounds(inst: PVInstance): (CFrame, Vector3)
+	if inst:IsA("Model") then
+		return inst:GetBoundingBox()
+	end
+	local part = inst :: BasePart
+	return part.CFrame, part.Size
+end
+
+local function placeholder(name: string): BasePart
+	local spec = Config.Assets[name]
+	local part = Instance.new("Part")
+	part.Name = name
+	part.Size = if spec then spec.size else Vector3.new(4, 4, 4)
+	part.Color = if spec then spec.color else Color3.fromRGB(200, 200, 200)
+	part.Material = Enum.Material.SmoothPlastic
+	part.TopSurface = Enum.SurfaceType.Smooth
+	part.BottomSurface = Enum.SurfaceType.Smooth
+	part:SetAttribute("Placeholder", true)
+	return part
+end
+
+-- Returns a fresh copy of the asset, not yet parented.
+function AssetLibrary.spawn(name: string): PVInstance
+	local folder = assetsFolder()
+	local template = folder and folder:FindFirstChild(name)
+	if template == nil or not template:IsA("PVInstance") then
+		return placeholder(name)
+	end
+	local copy = (template :: PVInstance):Clone()
+	local spec = Config.Assets[name]
+	if copy:IsA("Model") and spec and spec.fitHeight ~= false then
+		local _, size = copy:GetBoundingBox()
+		if size.Y > 0 then
+			copy:ScaleTo(copy:GetScale() * (spec.size.Y / size.Y))
+		end
+	end
+	return copy
+end
+
+-- Moves `inst` so the bottom of its bounding box sits on `ground`, whatever its pivot.
+function AssetLibrary.placeOnGround(inst: PVInstance, ground: CFrame)
+	inst:PivotTo(ground)
+	local box, size = bounds(inst)
+	local bottom = box.Position.Y - size.Y / 2
+	inst:PivotTo(ground + Vector3.new(0, ground.Position.Y - bottom, 0))
+end
+
+function AssetLibrary.topY(inst: PVInstance): number
+	local box, size = bounds(inst)
+	return box.Position.Y + size.Y / 2
+end
+
+function AssetLibrary.parts(inst: Instance): { BasePart }
+	local list: { BasePart } = {}
+	if inst:IsA("BasePart") then
+		table.insert(list, inst)
+	end
+	for _, d in inst:GetDescendants() do
+		if d:IsA("BasePart") then
+			table.insert(list, d)
+		end
+	end
+	return list
+end
+
+-- Physics flags for a role. CollisionFidelity cannot be set from scripts; set it on the
+-- imported MeshParts in Studio (studio-importer covers which value to pick).
+function AssetLibrary.applyRole(inst: Instance, role: string)
+	for _, part in AssetLibrary.parts(inst) do
+		part.Anchored = role ~= "cosmetic"
+		if role == "platform" or role == "finish" or role == "shop" or role == "checkpoint" then
+			part.CanCollide = true
+			part.CanTouch = role ~= "shop"
+		elseif role == "collectible" then
+			part.CanCollide = false
+			part.CanTouch = true
+			part.CanQuery = false
+		elseif role == "cosmetic" then
+			part.CanCollide = false
+			part.CanTouch = false
+			part.CanQuery = false
+			part.Massless = true
+		else -- decor
+			part.CanCollide = true
+			part.CanTouch = false
+		end
+	end
+end
+
+return AssetLibrary
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="5">
+        <Properties>
+          <string name="Name">GameConfig</string>
+          <string name="Source"><![CDATA[--!strict
+-- Single source of truth for the game. luau-scripter rewrites this file from the
+-- design doc and the prop-modeler manifest. Every asset name here must match a
+-- child of ReplicatedStorage.Assets once imported; until then a coloured block
+-- of the same size stands in, so the place is playable from the first build.
+
+export type AssetSpec = {
+	size: Vector3, -- studs, used for the placeholder and for fitting imported models
+	color: Color3, -- placeholder colour
+	role: "platform" | "collectible" | "checkpoint" | "decor" | "finish" | "shop" | "cosmetic",
+	fitHeight: boolean?, -- scale imported Models to size.Y (default true)
+}
+
+export type Skin = {
+	id: string,
+	displayName: string,
+	asset: string, -- name in ReplicatedStorage.Assets (a retextured variant)
+	price: number, -- in-game coins; 0 = free starter
+}
+
+local Config = {}
+
+Config.DataStoreName = "SloydGame_v1"
+Config.AutosaveSeconds = 120
+
+Config.Assets = {
+	GumdropPlatform = { size = Vector3.new(9.96, 2.5, 10.0), color = Color3.fromRGB(255, 120, 190), role = "platform" },
+	WrappedCandy = { size = Vector3.new(2.5, 0.96, 0.8), color = Color3.fromRGB(255, 220, 80), role = "collectible" },
+	CupcakeCheckpoint = { size = Vector3.new(4.51, 6.0, 4.51), color = Color3.fromRGB(120, 230, 255), role = "checkpoint" },
+	LollipopTree = { size = Vector3.new(8.01, 16.0, 8.01), color = Color3.fromRGB(180, 120, 255), role = "decor" },
+	GiantCake = { size = Vector3.new(13.71, 12.0, 13.71), color = Color3.fromRGB(255, 245, 235), role = "finish" },
+	CandyShopStand = { size = Vector3.new(9.57, 9.0, 8.52), color = Color3.fromRGB(120, 255, 180), role = "shop" },
+	CandyBackpack = { size = Vector3.new(1.64, 2.5, 2.06), color = Color3.fromRGB(255, 120, 190), role = "cosmetic" },
+} :: { [string]: AssetSpec }
+
+-- Obby course: platforms laid out from the spawn, rising and drifting sideways.
+Config.Course = {
+	seed = 7,
+	stages = 16,
+	platform = "GumdropPlatform",
+	-- Default character: WalkSpeed 16, JumpHeight 7.2 -> ~0.54 s airtime -> ~8.5 studs of
+	-- horizontal travel. Keep the edge-to-edge gap (gap - platform width) at 6 or less.
+	gap = 14, -- studs between platform centres
+	rise = 2.5, -- max height gained per jump (must stay well under 7.2)
+	sideways = 6,
+	checkpoint = "CupcakeCheckpoint",
+	checkpointEvery = 4,
+	finish = "GiantCake",
+	finishReward = 25,
+}
+
+Config.Collectibles = {
+	asset = "WrappedCandy",
+	value = 1,
+	respawnSeconds = 12,
+	hover = 3.5, -- studs above the platform top
+}
+
+Config.Decor = {
+	{ asset = "LollipopTree", count = 14, minRadius = 30, maxRadius = 90 },
+}
+
+Config.KillFloor = { enabled = true, height = -12, color = Color3.fromRGB(110, 60, 35) }
+
+Config.Shop = {
+	stand = "CandyShopStand",
+	position = Vector3.new(-18, 0, 0),
+	item = "CandyBackpack",
+	skins = {
+		{ id = "Classic", displayName = "Classic Pink", asset = "CandyBackpack", price = 0 },
+		{ id = "Mint", displayName = "Mint Swirl", asset = "CandyBackpack_Mint", price = 15 },
+		{ id = "Chocolate", displayName = "Choco Fudge", asset = "CandyBackpack_Chocolate", price = 30 },
+		{ id = "Galaxy", displayName = "Galaxy Gummy", asset = "CandyBackpack_Galaxy", price = 60 },
+	} :: { Skin },
+	-- Robux developer products that grant coins. productId 0 = hidden until you create one
+	-- (Creator Dashboard -> your experience -> Monetization -> Developer Products).
+	coinProducts = {
+		{ productId = 0, coins = 100 },
+	},
+}
+
+-- Fill with the rbxassetid of each uploaded face (see world-backdrop). nil = default sky.
+Config.Sky = nil :: { [string]: string }?
+
+return Config
+]]></string>
+        </Properties>
+      </Item>
+    </Item>
+  </Item>
+  <Item class="ServerScriptService" referent="6">
+    <Properties>
+      <string name="Name">ServerScriptService</string>
+    </Properties>
+    <Item class="Folder" referent="7">
+      <Properties>
+        <string name="Name">Server</string>
+      </Properties>
+      <Item class="ModuleScript" referent="8">
+        <Properties>
+          <string name="Name">DataService</string>
+          <string name="Source"><![CDATA[--!strict
+-- Player data: coins, best stage, owned/equipped skins. One DataStore key per player.
+-- If a load fails the session is marked unsaveable so a bad read never overwrites data.
+-- In Studio, enable Game Settings -> Security -> "Enable Studio Access to API Services".
+
+local DataStoreService = game:GetService("DataStoreService")
+local Players = game:GetService("Players")
+
+local Config = require(game:GetService("ReplicatedStorage").Shared.GameConfig)
+
+export type Data = {
+	coins: number,
+	bestStage: number,
+	owned: { [string]: boolean },
+	equipped: string,
+	receipts: { string }, -- recent developer-product PurchaseIds, for idempotent grants
+}
+
+type Session = { data: Data, canSave: boolean }
+
+local DataService = {}
+
+local store: DataStore? = nil
+local sessions: { [Player]: Session } = {}
+local changed = Instance.new("BindableEvent")
+DataService.Changed = changed.Event -- (player, data)
+
+local function defaultData(): Data
+	local starter = Config.Shop.skins[1]
+	return { coins = 0, bestStage = 0, owned = { [starter.id] = true }, equipped = starter.id, receipts = {} }
+end
+
+local function key(player: Player): string
+	return "u_" .. player.UserId
+end
+
+local function withRetries<T>(fn: () -> T): (boolean, T | string)
+	local lastErr: any = nil
+	for attempt = 1, 3 do
+		local ok, result = pcall(fn)
+		if ok then
+			return true, result
+		end
+		lastErr = result
+		task.wait(attempt * 2)
+	end
+	return false, tostring(lastErr)
+end
+
+local function leaderstats(player: Player, data: Data)
+	local folder: Folder = (player:FindFirstChild("leaderstats") :: Folder?) or Instance.new("Folder")
+	folder.Name = "leaderstats"
+	local coins: IntValue = (folder:FindFirstChild("Coins") :: IntValue?) or Instance.new("IntValue")
+	coins.Name = "Coins"
+	coins.Value = data.coins
+	coins.Parent = folder
+	local stage: IntValue = (folder:FindFirstChild("Stage") :: IntValue?) or Instance.new("IntValue")
+	stage.Name = "Stage"
+	stage.Parent = folder
+	folder.Parent = player
+end
+
+local function load(player: Player)
+	local data = defaultData()
+	local canSave = false
+	if store then
+		local ok, result = withRetries(function()
+			return (store :: DataStore):GetAsync(key(player))
+		end)
+		if ok then
+			canSave = true
+			if type(result) == "table" then
+				local saved = result :: any
+				data.coins = tonumber(saved.coins) or 0
+				data.bestStage = tonumber(saved.bestStage) or 0
+				data.owned = if type(saved.owned) == "table" then saved.owned else data.owned
+				data.equipped = if type(saved.equipped) == "string" then saved.equipped else data.equipped
+				data.receipts = if type(saved.receipts) == "table" then saved.receipts else {}
+			end
+		else
+			warn(`[DataService] load failed for {player.Name}, progress will not save this session: {result}`)
+		end
+	end
+	sessions[player] = { data = data, canSave = canSave }
+	leaderstats(player, data)
+	changed:Fire(player, data)
+end
+
+local function save(player: Player)
+	local session = sessions[player]
+	if not session or not session.canSave or not store then
+		return
+	end
+	local snapshot = table.clone(session.data)
+	local ok, err = withRetries(function()
+		return (store :: DataStore):UpdateAsync(key(player), function()
+			return snapshot
+		end)
+	end)
+	if not ok then
+		warn(`[DataService] save failed for {player.Name}: {err}`)
+	end
+end
+
+function DataService.get(player: Player): Data?
+	local s = sessions[player]
+	return if s then s.data else nil
+end
+
+function DataService.addCoins(player: Player, amount: number)
+	local data = DataService.get(player)
+	if not data then
+		return
+	end
+	data.coins = math.max(0, data.coins + amount)
+	local stats = player:FindFirstChild("leaderstats")
+	local coins = stats and stats:FindFirstChild("Coins") :: IntValue?
+	if coins then
+		coins.Value = data.coins
+	end
+	changed:Fire(player, data)
+end
+
+function DataService.update(player: Player, fn: (Data) -> ())
+	local data = DataService.get(player)
+	if data then
+		fn(data)
+		changed:Fire(player, data)
+	end
+end
+
+function DataService.init()
+	local ok, result = pcall(function()
+		return DataStoreService:GetDataStore(Config.DataStoreName)
+	end)
+	if ok then
+		store = result
+	else
+		warn("[DataService] DataStores unavailable, running without saving: " .. tostring(result))
+	end
+
+	Players.PlayerAdded:Connect(load)
+	for _, p in Players:GetPlayers() do
+		task.spawn(load, p)
+	end
+	Players.PlayerRemoving:Connect(function(player)
+		save(player)
+		sessions[player] = nil
+	end)
+	game:BindToClose(function()
+		local remaining = 0
+		for player in sessions do
+			remaining += 1
+			task.spawn(function()
+				save(player)
+				remaining -= 1
+			end)
+		end
+		local deadline = os.clock() + 25 -- BindToClose has ~30 s before shutdown
+		while remaining > 0 and os.clock() < deadline do
+			task.wait(0.2)
+		end
+	end)
+	task.spawn(function()
+		while true do
+			task.wait(Config.AutosaveSeconds)
+			for player in sessions do
+				task.spawn(save, player)
+			end
+		end
+	end)
+end
+
+return DataService
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="Script" referent="9">
+        <Properties>
+          <string name="Name">Main</string>
+          <token name="RunContext">0</token>
+          <string name="Source"><![CDATA[--!strict
+-- Entry point. Order matters: data first, then remotes, then the world and shop.
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local DataService = require(script.Parent.DataService)
+local WorldService = require(script.Parent.WorldService)
+local ShopService = require(script.Parent.ShopService)
+
+local remotes = Instance.new("Folder")
+remotes.Name = "Remotes"
+local notify = Instance.new("RemoteEvent")
+notify.Name = "Notify"
+notify.Parent = remotes
+local dataChanged = Instance.new("RemoteEvent")
+dataChanged.Name = "DataChanged"
+dataChanged.Parent = remotes
+local getData = Instance.new("RemoteFunction")
+getData.Name = "GetData"
+getData.Parent = remotes
+getData.OnServerInvoke = function(player: Player)
+	local data = DataService.get(player)
+	return if data then { coins = data.coins, owned = data.owned, equipped = data.equipped } else nil
+end
+remotes.Parent = ReplicatedStorage
+
+DataService.init()
+DataService.Changed:Connect(function(player: Player, data: DataService.Data)
+	dataChanged:FireClient(player, { coins = data.coins, owned = data.owned, equipped = data.equipped })
+end)
+
+ShopService.init(remotes)
+WorldService.init()
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="10">
+        <Properties>
+          <string name="Name">ShopService</string>
+          <string name="Source"><![CDATA[--!strict
+-- Cosmetic shop: skins are retextured variants of one item (skin-variants generates them).
+-- The server owns every price check; the client only sends a skin id.
+-- Optional Robux coin packs via developer products, granted idempotently in ProcessReceipt.
+
+local MarketplaceService = game:GetService("MarketplaceService")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Shared = ReplicatedStorage.Shared
+local Config = require(Shared.GameConfig)
+local AssetLibrary = require(Shared.AssetLibrary)
+local DataService = require(script.Parent.DataService)
+
+local ShopService = {}
+
+local MAX_RECEIPTS = 50
+
+local skinsById: { [string]: typeof(Config.Shop.skins[1]) } = {}
+for _, skin in Config.Shop.skins do
+	skinsById[skin.id] = skin
+end
+
+local function attachCosmetic(player: Player, skinId: string)
+	local character = player.Character
+	local skin = skinsById[skinId]
+	if not character or not skin then
+		return
+	end
+	local torso = (character:FindFirstChild("UpperTorso") or character:FindFirstChild("Torso")) :: BasePart?
+	if not torso then
+		return
+	end
+	local old = character:FindFirstChild("Cosmetic")
+	if old then
+		old:Destroy()
+	end
+
+	local item = AssetLibrary.spawn(skin.asset)
+	AssetLibrary.applyRole(item, "cosmetic")
+	item.Name = "Cosmetic"
+	local _, size = if item:IsA("Model") then item:GetBoundingBox() else (item :: BasePart).CFrame, (item :: BasePart).Size
+	-- On the back, facing the same way as the character.
+	item:PivotTo(torso.CFrame * CFrame.new(0, 0, torso.Size.Z / 2 + size.Z / 2))
+	for _, part in AssetLibrary.parts(item) do
+		local weld = Instance.new("WeldConstraint")
+		weld.Part0 = torso
+		weld.Part1 = part
+		weld.Parent = part
+	end
+	item.Parent = character
+end
+
+local function handleRequest(player: Player, action: unknown, skinId: unknown): (boolean, string)
+	if type(action) ~= "string" or type(skinId) ~= "string" then
+		return false, "bad request"
+	end
+	local skin = skinsById[skinId]
+	local data = DataService.get(player)
+	if not skin or not data then
+		return false, "unknown skin"
+	end
+	if action == "buy" then
+		if data.owned[skin.id] then
+			return false, "already owned"
+		end
+		if data.coins < skin.price then
+			return false, `need {skin.price - data.coins} more coins`
+		end
+		DataService.addCoins(player, -skin.price)
+		DataService.update(player, function(d)
+			d.owned[skin.id] = true
+			d.equipped = skin.id
+		end)
+		attachCosmetic(player, skin.id)
+		return true, `bought {skin.displayName}`
+	elseif action == "equip" then
+		if not data.owned[skin.id] then
+			return false, "not owned"
+		end
+		DataService.update(player, function(d)
+			d.equipped = skin.id
+		end)
+		attachCosmetic(player, skin.id)
+		return true, `equipped {skin.displayName}`
+	end
+	return false, "unknown action"
+end
+
+local function processReceipt(receipt): Enum.ProductPurchaseDecision
+	local player = Players:GetPlayerByUserId(receipt.PlayerId)
+	local data = player and DataService.get(player)
+	if not player or not data then
+		return Enum.ProductPurchaseDecision.NotProcessedYet -- Roblox retries later
+	end
+	if table.find(data.receipts, receipt.PurchaseId) then
+		return Enum.ProductPurchaseDecision.PurchaseGranted
+	end
+	for _, product in Config.Shop.coinProducts do
+		if product.productId ~= 0 and product.productId == receipt.ProductId then
+			DataService.addCoins(player, product.coins)
+			DataService.update(player, function(d)
+				table.insert(d.receipts, receipt.PurchaseId)
+				while #d.receipts > MAX_RECEIPTS do
+					table.remove(d.receipts, 1)
+				end
+			end)
+			return Enum.ProductPurchaseDecision.PurchaseGranted
+		end
+	end
+	return Enum.ProductPurchaseDecision.NotProcessedYet
+end
+
+function ShopService.init(remotes: Folder)
+	local request = Instance.new("RemoteFunction")
+	request.Name = "ShopRequest"
+	request.Parent = remotes
+	request.OnServerInvoke = handleRequest
+
+	local openShop = Instance.new("RemoteEvent")
+	openShop.Name = "OpenShop"
+	openShop.Parent = remotes
+
+	-- Shop stand with a ProximityPrompt next to the spawn.
+	local stand = AssetLibrary.spawn(Config.Shop.stand)
+	AssetLibrary.applyRole(stand, "shop")
+	AssetLibrary.placeOnGround(stand, CFrame.new(Config.Shop.position) * CFrame.Angles(0, math.rad(90), 0))
+	stand.Name = "ShopStand"
+	stand.Parent = workspace
+	local anchor = AssetLibrary.parts(stand)[1]
+	local prompt = Instance.new("ProximityPrompt")
+	prompt.ActionText = "Open shop"
+	prompt.ObjectText = "Candy Shop"
+	prompt.MaxActivationDistance = 12
+	prompt.RequiresLineOfSight = false
+	prompt.Parent = anchor
+	prompt.Triggered:Connect(function(player)
+		openShop:FireClient(player)
+	end)
+
+	MarketplaceService.ProcessReceipt = processReceipt
+
+	Players.PlayerAdded:Connect(function(player)
+		player.CharacterAdded:Connect(function()
+			local data = DataService.get(player)
+			if data then
+				task.defer(attachCosmetic, player, data.equipped)
+			end
+		end)
+	end)
+end
+
+return ShopService
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="11">
+        <Properties>
+          <string name="Name">WorldService</string>
+          <string name="Source"><![CDATA[--!strict
+-- Builds the level from GameConfig: obby platforms, collectibles, checkpoints, finish,
+-- kill floor, decor and sky. Deterministic (seeded), so every server gets the same course.
+
+local CollectionService = game:GetService("CollectionService")
+local Lighting = game:GetService("Lighting")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Shared = ReplicatedStorage.Shared
+local Config = require(Shared.GameConfig)
+local AssetLibrary = require(Shared.AssetLibrary)
+local DataService = require(script.Parent.DataService)
+
+local WorldService = {}
+
+local world: Folder
+
+local function playerFromHit(hit: BasePart): (Player?, Humanoid?)
+	local character = hit:FindFirstAncestorOfClass("Model")
+	if not character then
+		return nil, nil
+	end
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	if not humanoid or humanoid.Health <= 0 then
+		return nil, nil
+	end
+	return Players:GetPlayerFromCharacter(character), humanoid
+end
+
+local function spawnAsset(name: string, ground: CFrame, parent: Instance): PVInstance
+	local inst = AssetLibrary.spawn(name)
+	local spec = Config.Assets[name]
+	AssetLibrary.applyRole(inst, if spec then spec.role else "decor")
+	AssetLibrary.placeOnGround(inst, ground)
+	inst.Parent = parent
+	return inst
+end
+
+local function onTouched(inst: Instance, handler: (Player, BasePart) -> ())
+	for _, part in AssetLibrary.parts(inst) do
+		if part.CanTouch then
+			part.Touched:Connect(function(hit)
+				local player = playerFromHit(hit)
+				if player then
+					handler(player, part)
+				end
+			end)
+		end
+	end
+end
+
+local function spawnCollectible(position: Vector3)
+	local inst = spawnAsset(Config.Collectibles.asset, CFrame.new(position), world)
+	CollectionService:AddTag(inst, "Collectible")
+	local taken = false
+	onTouched(inst, function(player)
+		if taken then
+			return
+		end
+		taken = true
+		DataService.addCoins(player, Config.Collectibles.value)
+		inst:Destroy()
+		task.delay(Config.Collectibles.respawnSeconds, spawnCollectible, position)
+	end)
+end
+
+local function makeCheckpoint(stage: number, ground: CFrame)
+	local marker = spawnAsset(Config.Course.checkpoint, ground * CFrame.new(0, 0, -2.5), world)
+	marker.Name = `Checkpoint{stage}`
+	CollectionService:AddTag(marker, "Checkpoint")
+
+	local spawn = Instance.new("SpawnLocation")
+	spawn.Name = `Spawn{stage}`
+	spawn.Anchored = true
+	spawn.Size = Vector3.new(6, 1, 6)
+	spawn.CFrame = ground * CFrame.new(0, 0.5, 2)
+	spawn.Transparency = 1
+	spawn.CanCollide = false
+	spawn.Neutral = true
+	spawn.Duration = 0
+	spawn.Enabled = false -- only used via Player.RespawnLocation
+	spawn.Parent = world
+
+	onTouched(marker, function(player)
+		local stats = player:FindFirstChild("leaderstats")
+		local value = stats and stats:FindFirstChild("Stage") :: IntValue?
+		if value and value.Value < stage then
+			value.Value = stage
+			player.RespawnLocation = spawn
+			DataService.update(player, function(data)
+				data.bestStage = math.max(data.bestStage, stage)
+			end)
+		end
+	end)
+end
+
+local function buildCourse(): CFrame
+	local course = Config.Course
+	local rng = Random.new(course.seed)
+	local platformTop = 1 -- the Start spawn pad's top surface
+	local position = Vector3.new(0, 0, 0)
+	local finishGround = CFrame.new()
+
+	for stage = 1, course.stages do
+		local dz = rng:NextNumber(-course.sideways, course.sideways)
+		local dy = rng:NextNumber(0.5, course.rise)
+		position = Vector3.new(position.X + course.gap, platformTop + dy - Config.Assets[course.platform].size.Y, position.Z + dz)
+		position = Vector3.new(position.X, math.max(position.Y, -4), math.clamp(position.Z, -20, 20))
+
+		local platform = spawnAsset(course.platform, CFrame.new(position), world)
+		platform.Name = `Platform{stage}`
+		platformTop = AssetLibrary.topY(platform)
+		local top = CFrame.new(position.X, platformTop, position.Z)
+
+		if stage % course.checkpointEvery == 0 then
+			makeCheckpoint(stage, top)
+		else
+			spawnCollectible(top.Position + Vector3.new(0, Config.Collectibles.hover, 0))
+		end
+		finishGround = top
+	end
+	return finishGround
+end
+
+local function buildFinish(lastTop: CFrame)
+	local ground = lastTop + Vector3.new(Config.Course.gap + 4, 0, 0)
+	local pad = Instance.new("Part")
+	pad.Name = "FinishPad"
+	pad.Anchored = true
+	pad.Size = Vector3.new(24, 2, 24)
+	pad.CFrame = ground - Vector3.new(0, 1, 0)
+	pad.Color = Color3.fromRGB(255, 200, 230)
+	pad.Material = Enum.Material.SmoothPlastic
+	pad.Parent = world
+
+	local finish = spawnAsset(Config.Course.finish, ground + Vector3.new(4, 0, 0), world)
+	finish.Name = "Finish"
+	local rewarded: { [Player]: boolean } = {}
+	onTouched(finish, function(player)
+		if rewarded[player] then
+			return
+		end
+		rewarded[player] = true
+		DataService.addCoins(player, Config.Course.finishReward)
+		local remote = ReplicatedStorage:FindFirstChild("Remotes") and ReplicatedStorage.Remotes:FindFirstChild("Notify")
+		if remote and remote:IsA("RemoteEvent") then
+			remote:FireClient(player, `You beat the course! +{Config.Course.finishReward} coins`)
+		end
+	end)
+	Players.PlayerRemoving:Connect(function(player)
+		rewarded[player] = nil
+	end)
+end
+
+local function buildKillFloor()
+	if not Config.KillFloor.enabled then
+		return
+	end
+	local floor = Instance.new("Part")
+	floor.Name = "KillFloor"
+	floor.Anchored = true
+	floor.Size = Vector3.new(2048, 2, 2048)
+	floor.Position = Vector3.new(0, Config.KillFloor.height, 0)
+	floor.Color = Config.KillFloor.color
+	floor.Material = Enum.Material.Neon
+	floor.Parent = world
+	floor.Touched:Connect(function(hit)
+		local _, humanoid = playerFromHit(hit)
+		if humanoid then
+			humanoid.Health = 0
+		end
+	end)
+end
+
+local function buildDecor()
+	local rng = Random.new(Config.Course.seed + 1)
+	local ground = Instance.new("Part")
+	ground.Name = "Ground"
+	ground.Anchored = true
+	ground.Size = Vector3.new(80, 2, 80)
+	ground.Position = Vector3.new(-10, -1, 0)
+	ground.Color = Color3.fromRGB(255, 214, 236)
+	ground.Material = Enum.Material.SmoothPlastic
+	ground.Parent = world
+
+	for _, entry in Config.Decor do
+		for i = 1, entry.count do
+			local angle = rng:NextNumber(0, math.pi * 2)
+			local radius = rng:NextNumber(entry.minRadius, entry.maxRadius)
+			local pos = Vector3.new(math.cos(angle) * radius, Config.KillFloor.height + 1, math.sin(angle) * radius)
+			if math.abs(pos.Z) < 26 and pos.X > -10 then
+				continue -- keep the course lane clear
+			end
+			local inst = spawnAsset(entry.asset, CFrame.new(pos) * CFrame.Angles(0, rng:NextNumber(0, math.pi * 2), 0), world)
+			inst.Name = `{entry.asset}{i}`
+		end
+	end
+end
+
+local SKY_FACES = { "SkyboxBk", "SkyboxDn", "SkyboxFt", "SkyboxLf", "SkyboxRt", "SkyboxUp" }
+
+local function applySky()
+	local ids = Config.Sky
+	if not ids then
+		return
+	end
+	local sky = Lighting:FindFirstChildOfClass("Sky") or Instance.new("Sky")
+	for _, face in SKY_FACES do
+		local id = ids[face]
+		if id then
+			(sky :: any)[face] = id
+		end
+	end
+	sky.CelestialBodiesShown = false
+	sky.StarCount = 0
+	sky.Parent = Lighting
+end
+
+function WorldService.init()
+	world = Instance.new("Folder")
+	world.Name = "World"
+	world.Parent = workspace
+
+	applySky()
+	buildKillFloor()
+	buildDecor()
+	buildFinish(buildCourse())
+
+	Players.PlayerAdded:Connect(function(player)
+		player.CharacterAdded:Connect(function()
+			-- RespawnLocation is reset on rejoin; restore it from saved progress.
+			local data = DataService.get(player)
+			if data and data.bestStage > 0 and not player.RespawnLocation then
+				local best = math.floor(data.bestStage / Config.Course.checkpointEvery) * Config.Course.checkpointEvery
+				local spawn = world:FindFirstChild(`Spawn{best}`) :: SpawnLocation?
+				if spawn then
+					player.RespawnLocation = spawn
+					local stats = player:FindFirstChild("leaderstats")
+					local stage = stats and stats:FindFirstChild("Stage") :: IntValue?
+					if stage then
+						stage.Value = best
+					end
+					task.defer(function()
+						local character = player.Character
+						if character then
+							character:PivotTo(spawn.CFrame + Vector3.new(0, 4, 0))
+						end
+					end)
+				end
+			end
+		end)
+	end)
+end
+
+return WorldService
+]]></string>
+        </Properties>
+      </Item>
+    </Item>
+  </Item>
+  <Item class="StarterPlayer" referent="12">
+    <Properties>
+      <string name="Name">StarterPlayer</string>
+    </Properties>
+    <Item class="StarterPlayerScripts" referent="13">
+      <Properties>
+        <string name="Name">StarterPlayerScripts</string>
+      </Properties>
+      <Item class="Folder" referent="14">
+        <Properties>
+          <string name="Name">Client</string>
+        </Properties>
+        <Item class="LocalScript" referent="15">
+          <Properties>
+            <string name="Name">Collectibles</string>
+            <string name="Source"><![CDATA[--!strict
+-- Spins and bobs collectibles on the client only, so the server never streams the motion.
+
+local CollectionService = game:GetService("CollectionService")
+local RunService = game:GetService("RunService")
+
+type Entry = { inst: PVInstance, base: CFrame, phase: number }
+local entries: { [Instance]: Entry } = {}
+
+local function add(inst: Instance)
+	if inst:IsA("PVInstance") then
+		entries[inst] = { inst = inst, base = inst:GetPivot(), phase = math.random() * math.pi * 2 }
+	end
+end
+
+CollectionService:GetInstanceAddedSignal("Collectible"):Connect(add)
+CollectionService:GetInstanceRemovedSignal("Collectible"):Connect(function(inst)
+	entries[inst] = nil
+end)
+for _, inst in CollectionService:GetTagged("Collectible") do
+	add(inst)
+end
+
+RunService.RenderStepped:Connect(function()
+	local t = os.clock()
+	for inst, e in entries do
+		if inst.Parent == nil then
+			entries[inst] = nil
+			continue
+		end
+		local bob = math.sin(t * 2 + e.phase) * 0.4
+		e.inst:PivotTo(e.base * CFrame.new(0, bob, 0) * CFrame.Angles(0, t * 1.5 + e.phase, 0))
+	end
+end)
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="LocalScript" referent="16">
+          <Properties>
+            <string name="Name">ShopUI</string>
+            <string name="Source"><![CDATA[--!strict
+-- Shop window (built in code so it ships with the scripts), coin packs, and toasts.
+
+local MarketplaceService = game:GetService("MarketplaceService")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Config = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("GameConfig"))
+local remotes = ReplicatedStorage:WaitForChild("Remotes")
+local shopRequest = remotes:WaitForChild("ShopRequest") :: RemoteFunction
+local openShop = remotes:WaitForChild("OpenShop") :: RemoteEvent
+local notify = remotes:WaitForChild("Notify") :: RemoteEvent
+local dataChanged = remotes:WaitForChild("DataChanged") :: RemoteEvent
+local getData = remotes:WaitForChild("GetData") :: RemoteFunction
+
+local player = Players.LocalPlayer
+
+type View = { coins: number, owned: { [string]: boolean }, equipped: string }
+local state: View = { coins = 0, owned = {}, equipped = "" }
+
+local PINK = Color3.fromRGB(255, 120, 190)
+local DARK = Color3.fromRGB(18, 35, 74)
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "ShopUI"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local function corner(parent: GuiObject, radius: number)
+	local c = Instance.new("UICorner")
+	c.CornerRadius = UDim.new(0, radius)
+	c.Parent = parent
+end
+
+local function label(parent: Instance, text: string, size: UDim2, pos: UDim2): TextLabel
+	local l = Instance.new("TextLabel")
+	l.BackgroundTransparency = 1
+	l.Text = text
+	l.Size = size
+	l.Position = pos
+	l.Font = Enum.Font.FredokaOne
+	l.TextScaled = true
+	l.TextColor3 = Color3.new(1, 1, 1)
+	l.Parent = parent
+	return l
+end
+
+local toast = label(gui, "", UDim2.fromScale(0.5, 0.06), UDim2.fromScale(0.25, 0.12))
+toast.Visible = false
+
+local function showToast(text: string)
+	toast.Text = text
+	toast.Visible = true
+	local stamp = os.clock()
+	toast:SetAttribute("Stamp", stamp)
+	task.delay(2.5, function()
+		if toast:GetAttribute("Stamp") == stamp then
+			toast.Visible = false
+		end
+	end)
+end
+
+local window = Instance.new("Frame")
+window.Name = "Window"
+window.AnchorPoint = Vector2.new(0.5, 0.5)
+window.Position = UDim2.fromScale(0.5, 0.5)
+window.Size = UDim2.fromScale(0.5, 0.6)
+window.BackgroundColor3 = DARK
+window.Visible = false
+window.Parent = gui
+corner(window, 18)
+local ratio = Instance.new("UIAspectRatioConstraint")
+ratio.AspectRatio = 1.4
+ratio.Parent = window
+
+label(window, "Candy Shop", UDim2.fromScale(0.6, 0.12), UDim2.fromScale(0.2, 0.03))
+local coinsLabel = label(window, "0 coins", UDim2.fromScale(0.3, 0.07), UDim2.fromScale(0.03, 0.05))
+
+local close = Instance.new("TextButton")
+close.Text = "X"
+close.Size = UDim2.fromScale(0.08, 0.11)
+close.Position = UDim2.fromScale(0.9, 0.03)
+close.BackgroundColor3 = PINK
+close.TextColor3 = Color3.new(1, 1, 1)
+close.Font = Enum.Font.FredokaOne
+close.TextScaled = true
+close.Parent = window
+corner(close, 10)
+close.Activated:Connect(function()
+	window.Visible = false
+end)
+
+local list = Instance.new("Frame")
+list.BackgroundTransparency = 1
+list.Size = UDim2.fromScale(0.94, 0.62)
+list.Position = UDim2.fromScale(0.03, 0.18)
+list.Parent = window
+local grid = Instance.new("UIGridLayout")
+grid.CellSize = UDim2.fromScale(0.23, 0.95)
+grid.CellPadding = UDim2.fromScale(0.02, 0)
+grid.Parent = list
+
+local buttons: { [string]: TextButton } = {}
+
+local function refresh()
+	coinsLabel.Text = `{state.coins} coins`
+	for _, skin in Config.Shop.skins do
+		local b = buttons[skin.id]
+		if b then
+			if state.equipped == skin.id then
+				b.Text = "Equipped"
+			elseif state.owned[skin.id] then
+				b.Text = "Equip"
+			else
+				b.Text = `Buy {skin.price}`
+			end
+		end
+	end
+end
+
+for _, skin in Config.Shop.skins do
+	local card = Instance.new("Frame")
+	card.BackgroundColor3 = Color3.fromRGB(11, 24, 51)
+	card.Parent = list
+	corner(card, 12)
+	label(card, skin.displayName, UDim2.fromScale(0.9, 0.25), UDim2.fromScale(0.05, 0.08))
+	local button = Instance.new("TextButton")
+	button.Size = UDim2.fromScale(0.86, 0.22)
+	button.Position = UDim2.fromScale(0.07, 0.7)
+	button.BackgroundColor3 = PINK
+	button.TextColor3 = Color3.new(1, 1, 1)
+	button.Font = Enum.Font.FredokaOne
+	button.TextScaled = true
+	button.Parent = card
+	corner(button, 10)
+	buttons[skin.id] = button
+	button.Activated:Connect(function()
+		local action = if state.owned[skin.id] then "equip" else "buy"
+		local ok, message = shopRequest:InvokeServer(action, skin.id)
+		showToast(message)
+		if ok then
+			window.Visible = false
+		end
+	end)
+end
+
+local packs = Instance.new("Frame")
+packs.BackgroundTransparency = 1
+packs.Size = UDim2.fromScale(0.94, 0.12)
+packs.Position = UDim2.fromScale(0.03, 0.84)
+packs.Parent = window
+local row = Instance.new("UIListLayout")
+row.FillDirection = Enum.FillDirection.Horizontal
+row.Padding = UDim.new(0.02, 0)
+row.Parent = packs
+for _, product in Config.Shop.coinProducts do
+	if product.productId ~= 0 then
+		local b = Instance.new("TextButton")
+		b.Size = UDim2.fromScale(0.3, 1)
+		b.Text = `+{product.coins} coins (R$)`
+		b.BackgroundColor3 = Color3.fromRGB(3, 245, 132)
+		b.TextColor3 = DARK
+		b.Font = Enum.Font.FredokaOne
+		b.TextScaled = true
+		b.Parent = packs
+		corner(b, 10)
+		b.Activated:Connect(function()
+			MarketplaceService:PromptProductPurchase(player, product.productId)
+		end)
+	end
+end
+
+openShop.OnClientEvent:Connect(function()
+	refresh()
+	window.Visible = true
+end)
+notify.OnClientEvent:Connect(showToast)
+dataChanged.OnClientEvent:Connect(function(view: View)
+	state = view
+	refresh()
+end)
+
+local initial = getData:InvokeServer()
+if initial then
+	state = initial
+end
+refresh()
+]]></string>
+          </Properties>
+        </Item>
+      </Item>
+    </Item>
+  </Item>
+  <Item class="Workspace" referent="17">
+    <Properties>
+      <string name="Name">Workspace</string>
+      <float name="Gravity">196.2</float>
+      <bool name="NeedsPivotMigration">false</bool>
+    </Properties>
+    <Item class="SpawnLocation" referent="18">
+      <Properties>
+        <string name="Name">Start</string>
+        <bool name="Anchored">true</bool>
+        <Color3uint8 name="Color3uint8">16759518</Color3uint8>
+        <int name="Duration">0</int>
+        <token name="Material">272</token>
+        <bool name="Neutral">true</bool>
+        <Vector3 name="Position">
+          <X>0</X>
+          <Y>0.5</Y>
+          <Z>0</Z>
+        </Vector3>
+        <Vector3 name="size">
+          <X>12</X>
+          <Y>1</Y>
+          <Z>12</Z>
+        </Vector3>
+      </Properties>
+    </Item>
+  </Item>
+</roblox>

@@ -1,0 +1,17 @@
+{
+  "name": "sloyd-roblox-studio-team",
+  "owner": {
+    "name": "Sloyd",
+    "url": "https://www.sloyd.ai"
+  },
+  "metadata": {
+    "description": "Sloyd's Roblox Studio Team plugin for Claude Code."
+  },
+  "plugins": [
+    {
+      "name": "roblox-studio",
+      "source": "./",
+      "description": "Idea to playable Roblox place: design doc, Sloyd 3D props under Roblox limits, shop skins, skybox, Luau scripts and Rojo."
+    }
+  ]
+}

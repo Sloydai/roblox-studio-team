@@ -1,0 +1,315 @@
+{
+  "game": "Candy Climb",
+  "style": {
+    "genStyleId": "Roblox",
+    "promptSuffix": "candy land theme, glossy sugar coating, pastel pink, mint and lemon colours, chunky rounded shapes, single object, centered, game asset"
+  },
+  "assets": [
+    {
+      "name": "GumdropPlatform",
+      "role": "platform",
+      "prompt": "a wide round gumdrop platform with a flat top you can stand on, sugar crystals on the sides",
+      "longestStuds": 10,
+      "triBudget": 3000,
+      "collision": "PreciseConvexDecomposition",
+      "count": 12,
+      "jobId": "4lbmlnci",
+      "status": "success",
+      "glbUrl": "https://storage.googleapis.com/ai-services-quality/jobs/4lbmlnci.glb",
+      "glbPath": "raw/GumdropPlatform.glb",
+      "export": {
+        "ready": true,
+        "triangles": 3000,
+        "sizeStuds": {
+          "x": 9.962,
+          "y": 2.505,
+          "z": 10.0
+        },
+        "files": {
+          "fbx": "export/GumdropPlatform/GumdropPlatform.fbx",
+          "obj": "export/GumdropPlatform/GumdropPlatform.obj",
+          "glb": "export/GumdropPlatform/GumdropPlatform.glb"
+        },
+        "error": null
+      }
+    },
+    {
+      "name": "WrappedCandy",
+      "role": "collectible",
+      "prompt": "a single wrapped hard candy with twisted wrapper ends",
+      "longestStuds": 2.5,
+      "triBudget": 800,
+      "collision": "Box",
+      "count": 12,
+      "jobId": "vxxhjvam",
+      "status": "success",
+      "glbUrl": "https://storage.googleapis.com/ai-services-quality/jobs/vxxhjvam.glb",
+      "glbPath": "raw/WrappedCandy.glb",
+      "export": {
+        "ready": true,
+        "triangles": 784,
+        "sizeStuds": {
+          "x": 2.5,
+          "y": 0.964,
+          "z": 0.8
+        },
+        "files": {
+          "fbx": "export/WrappedCandy/WrappedCandy.fbx",
+          "obj": "export/WrappedCandy/WrappedCandy.obj",
+          "glb": "export/WrappedCandy/WrappedCandy.glb"
+        },
+        "error": null
+      }
+    },
+    {
+      "name": "CupcakeCheckpoint",
+      "role": "checkpoint",
+      "prompt": "a giant cupcake with a small flag on top made of a wafer",
+      "heightStuds": 6,
+      "triBudget": 4000,
+      "collision": "Hull",
+      "count": 4,
+      "jobId": "gg7xqu0g",
+      "status": "success",
+      "glbUrl": "https://storage.googleapis.com/ai-services-quality/jobs/gg7xqu0g.glb",
+      "glbPath": "raw/CupcakeCheckpoint.glb",
+      "export": {
+        "ready": true,
+        "triangles": 4000,
+        "sizeStuds": {
+          "x": 4.507,
+          "y": 6.0,
+          "z": 4.508
+        },
+        "files": {
+          "fbx": "export/CupcakeCheckpoint/CupcakeCheckpoint.fbx",
+          "obj": "export/CupcakeCheckpoint/CupcakeCheckpoint.obj",
+          "glb": "export/CupcakeCheckpoint/CupcakeCheckpoint.glb"
+        },
+        "error": null
+      }
+    },
+    {
+      "name": "LollipopTree",
+      "role": "decor",
+      "prompt": "a tall swirl lollipop tree with a striped candy cane trunk",
+      "heightStuds": 16,
+      "triBudget": 3000,
+      "collision": "Hull",
+      "count": 14,
+      "jobId": "g7j5uuwj",
+      "status": "success",
+      "glbUrl": "https://storage.googleapis.com/ai-services-quality/jobs/g7j5uuwj.glb",
+      "glbPath": "raw/LollipopTree.glb",
+      "export": {
+        "ready": true,
+        "triangles": 3000,
+        "sizeStuds": {
+          "x": 8.009,
+          "y": 16.0,
+          "z": 8.009
+        },
+        "files": {
+          "fbx": "export/LollipopTree/LollipopTree.fbx",
+          "obj": "export/LollipopTree/LollipopTree.obj",
+          "glb": "export/LollipopTree/LollipopTree.glb"
+        },
+        "error": null
+      }
+    },
+    {
+      "name": "GiantCake",
+      "role": "finish",
+      "prompt": "a three-tier celebration cake with dripping icing and a cherry on top",
+      "heightStuds": 12,
+      "triBudget": 12000,
+      "collision": "PreciseConvexDecomposition",
+      "count": 1,
+      "jobId": "gai4ysca",
+      "status": "success",
+      "glbUrl": "https://storage.googleapis.com/ai-services-quality/jobs/gai4ysca.glb",
+      "glbPath": "raw/GiantCake.glb",
+      "export": {
+        "ready": true,
+        "triangles": 11999,
+        "sizeStuds": {
+          "x": 13.714,
+          "y": 12.0,
+          "z": 13.714
+        },
+        "files": {
+          "fbx": "export/GiantCake/GiantCake.fbx",
+          "obj": "export/GiantCake/GiantCake.obj",
+          "glb": "export/GiantCake/GiantCake.glb"
+        },
+        "error": null
+      }
+    },
+    {
+      "name": "CandyShopStand",
+      "role": "shop",
+      "prompt": "a small candy market stall with a striped awning and jars of sweets on the counter",
+      "heightStuds": 9,
+      "triBudget": 8000,
+      "collision": "Hull",
+      "count": 1,
+      "jobId": "g9dp2s3c",
+      "status": "success",
+      "glbUrl": "https://storage.googleapis.com/ai-services-quality/jobs/g9dp2s3c.glb",
+      "glbPath": "raw/CandyShopStand.glb",
+      "export": {
+        "ready": true,
+        "triangles": 8000,
+        "sizeStuds": {
+          "x": 9.569,
+          "y": 9.0,
+          "z": 8.518
+        },
+        "files": {
+          "fbx": "export/CandyShopStand/CandyShopStand.fbx",
+          "obj": "export/CandyShopStand/CandyShopStand.obj",
+          "glb": "export/CandyShopStand/CandyShopStand.glb"
+        },
+        "error": null
+      }
+    },
+    {
+      "name": "CandyBackpack",
+      "role": "cosmetic",
+      "prompt": "a cute backpack shaped like a pink gummy bear",
+      "heightStuds": 2.5,
+      "triBudget": 2500,
+      "collision": "Box",
+      "count": 1,
+      "jobId": "sdmxlt64",
+      "status": "success",
+      "glbUrl": "https://storage.googleapis.com/ai-services-quality/jobs/sdmxlt64.glb",
+      "glbPath": "raw/CandyBackpack.glb",
+      "export": {
+        "ready": true,
+        "triangles": 2500,
+        "sizeStuds": {
+          "x": 1.644,
+          "y": 2.5,
+          "z": 2.062
+        },
+        "files": {
+          "fbx": "export/CandyBackpack/CandyBackpack.fbx",
+          "obj": "export/CandyBackpack/CandyBackpack.obj",
+          "glb": "export/CandyBackpack/CandyBackpack.glb"
+        },
+        "error": null
+      }
+    },
+    {
+      "role": "cosmetic",
+      "heightStuds": 2.5,
+      "triBudget": 2500,
+      "collision": "Box",
+      "base": "CandyBackpack",
+      "name": "CandyBackpack_Mint",
+      "displayName": "Mint Swirl",
+      "prompt": "mint green and white peppermint swirl, glossy hard candy",
+      "price": 15,
+      "variantOf": "CandyBackpack",
+      "jobId": "iv4zq3m4",
+      "status": "success",
+      "glbUrl": "https://storage.googleapis.com/ai-services-quality/jobs/iv4zq3m4.glb",
+      "glbPath": "raw/CandyBackpack_Mint.glb",
+      "export": {
+        "ready": true,
+        "triangles": 2500,
+        "sizeStuds": {
+          "x": 1.644,
+          "y": 2.5,
+          "z": 2.062
+        },
+        "files": {
+          "fbx": "export/CandyBackpack_Mint/CandyBackpack_Mint.fbx",
+          "obj": "export/CandyBackpack_Mint/CandyBackpack_Mint.obj",
+          "glb": "export/CandyBackpack_Mint/CandyBackpack_Mint.glb"
+        },
+        "error": null
+      }
+    },
+    {
+      "role": "cosmetic",
+      "heightStuds": 2.5,
+      "triBudget": 2500,
+      "collision": "Box",
+      "base": "CandyBackpack",
+      "name": "CandyBackpack_Chocolate",
+      "displayName": "Choco Fudge",
+      "prompt": "rich milk chocolate with fudge drizzle and rainbow sprinkles",
+      "price": 30,
+      "variantOf": "CandyBackpack",
+      "jobId": "7928gabp",
+      "status": "success",
+      "glbUrl": "https://storage.googleapis.com/ai-services-quality/jobs/7928gabp.glb",
+      "glbPath": "raw/CandyBackpack_Chocolate.glb",
+      "export": {
+        "ready": true,
+        "triangles": 2500,
+        "sizeStuds": {
+          "x": 1.644,
+          "y": 2.5,
+          "z": 2.062
+        },
+        "files": {
+          "fbx": "export/CandyBackpack_Chocolate/CandyBackpack_Chocolate.fbx",
+          "obj": "export/CandyBackpack_Chocolate/CandyBackpack_Chocolate.obj",
+          "glb": "export/CandyBackpack_Chocolate/CandyBackpack_Chocolate.glb"
+        },
+        "error": null
+      }
+    },
+    {
+      "role": "cosmetic",
+      "heightStuds": 2.5,
+      "triBudget": 2500,
+      "collision": "Box",
+      "base": "CandyBackpack",
+      "name": "CandyBackpack_Galaxy",
+      "displayName": "Galaxy Gummy",
+      "prompt": "translucent purple and blue galaxy gummy with tiny glitter stars",
+      "price": 60,
+      "variantOf": "CandyBackpack",
+      "jobId": "wg1m6q9d",
+      "status": "success",
+      "glbUrl": "https://storage.googleapis.com/ai-services-quality/jobs/wg1m6q9d.glb",
+      "glbPath": "raw/CandyBackpack_Galaxy.glb",
+      "export": {
+        "ready": true,
+        "triangles": 2500,
+        "sizeStuds": {
+          "x": 1.644,
+          "y": 2.5,
+          "z": 2.062
+        },
+        "files": {
+          "fbx": "export/CandyBackpack_Galaxy/CandyBackpack_Galaxy.fbx",
+          "obj": "export/CandyBackpack_Galaxy/CandyBackpack_Galaxy.obj",
+          "glb": "export/CandyBackpack_Galaxy/CandyBackpack_Galaxy.glb"
+        },
+        "error": null
+      }
+    }
+  ],
+  "skybox": {
+    "prompt": "pastel candy land sky at golden hour, pink and peach cotton candy clouds, distant lollipop hills and a chocolate river on the horizon",
+    "genStyleId": "CozyMobile",
+    "jobId": "n0bbe2c3",
+    "status": "success",
+    "outputs": {
+      "cubemapFaceUrls": [
+        "https://storage.googleapis.com/ai-services-quality/panorama/4ab32e96-ed6a-4602-9bb0-1216ea66f49a_cxpos.webp",
+        "https://storage.googleapis.com/ai-services-quality/panorama/4ab32e96-ed6a-4602-9bb0-1216ea66f49a_cxneg.webp",
+        "https://storage.googleapis.com/ai-services-quality/jobs/n0bbe2c3_fixed_cypos.webp",
+        "https://storage.googleapis.com/ai-services-quality/jobs/n0bbe2c3_fixed_cyneg.webp",
+        "https://storage.googleapis.com/ai-services-quality/panorama/4ab32e96-ed6a-4602-9bb0-1216ea66f49a_czpos.webp",
+        "https://storage.googleapis.com/ai-services-quality/panorama/4ab32e96-ed6a-4602-9bb0-1216ea66f49a_czneg.webp"
+      ],
+      "panoramaUrl": "https://storage.googleapis.com/ai-services-quality/jobs/n0bbe2c3_panorama.webp"
+    }
+  }
+}

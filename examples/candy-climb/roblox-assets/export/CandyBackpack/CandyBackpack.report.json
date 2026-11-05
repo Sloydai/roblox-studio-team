@@ -1,0 +1,242 @@
+{
+  "ok": true,
+  "name": "CandyBackpack",
+  "input": "/projects/sandbox/roblox-studio-team/examples/candy-climb/roblox-assets/raw/CandyBackpack.glb",
+  "before": {
+    "meshes": [
+      {
+        "name": "input",
+        "open_edges": 0,
+        "triangles": 2500,
+        "vertices": 1355,
+        "materials": 1,
+        "textures": [
+          {
+            "name": "base_color_9595cbcd-18f3-463f-bb48-a1df0dfb6947",
+            "size": [
+              1024,
+              1024
+            ]
+          },
+          {
+            "name": "input_metallic-input_roughness",
+            "size": [
+              1024,
+              1024
+            ]
+          },
+          {
+            "name": "normal_9595cbcd-18f3-463f-bb48-a1df0dfb6947",
+            "size": [
+              1024,
+              1024
+            ]
+          }
+        ]
+      }
+    ],
+    "total_triangles": 2500,
+    "size_studs": {
+      "x": 0.25,
+      "y": 0.38,
+      "z": 0.313
+    }
+  },
+  "after": {
+    "meshes": [
+      {
+        "name": "input",
+        "open_edges": 0,
+        "triangles": 2500,
+        "vertices": 1355,
+        "materials": 1,
+        "textures": [
+          {
+            "name": "base_color_9595cbcd-18f3-463f-bb48-a1df0dfb6947",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "name": "input_metallic-input_roughness",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "name": "normal_9595cbcd-18f3-463f-bb48-a1df0dfb6947",
+            "size": [
+              256,
+              256
+            ]
+          }
+        ]
+      }
+    ],
+    "total_triangles": 2500,
+    "size_studs": {
+      "x": 1.644,
+      "y": 2.5,
+      "z": 2.062
+    }
+  },
+  "decimated": [],
+  "scale_factor": 6.578947,
+  "texture_max": 256,
+  "textures_downscaled": [
+    {
+      "name": "base_color_9595cbcd-18f3-463f-bb48-a1df0dfb6947",
+      "from": [
+        1024,
+        1024
+      ],
+      "to": [
+        256,
+        256
+      ]
+    },
+    {
+      "name": "input_metallic-input_roughness",
+      "from": [
+        1024,
+        1024
+      ],
+      "to": [
+        256,
+        256
+      ]
+    },
+    {
+      "name": "normal_9595cbcd-18f3-463f-bb48-a1df0dfb6947",
+      "from": [
+        1024,
+        1024
+      ],
+      "to": [
+        256,
+        256
+      ]
+    }
+  ],
+  "textures_written": [
+    "/projects/sandbox/roblox-studio-team/examples/candy-climb/roblox-assets/export/CandyBackpack/textures/CandyBackpack_0.png",
+    "/projects/sandbox/roblox-studio-team/examples/candy-climb/roblox-assets/export/CandyBackpack/textures/CandyBackpack_1.png",
+    "/projects/sandbox/roblox-studio-team/examples/candy-climb/roblox-assets/export/CandyBackpack/textures/CandyBackpack_2.png"
+  ],
+  "outputs": {
+    "fbx": "/projects/sandbox/roblox-studio-team/examples/candy-climb/roblox-assets/export/CandyBackpack/CandyBackpack.fbx",
+    "obj": "/projects/sandbox/roblox-studio-team/examples/candy-climb/roblox-assets/export/CandyBackpack/CandyBackpack.obj",
+    "glb": "/projects/sandbox/roblox-studio-team/examples/candy-climb/roblox-assets/export/CandyBackpack/CandyBackpack.glb"
+  },
+  "verification": {
+    "fbx": {
+      "ok": true,
+      "total_triangles": 2500,
+      "open_edges": 0,
+      "meshes": [
+        {
+          "name": "input",
+          "triangles": 2500,
+          "textures": [
+            {
+              "name": "base_color_9595cbcd-18f3-463f-bb48-a1df0dfb6947",
+              "size": [
+                256,
+                256
+              ]
+            },
+            {
+              "name": "normal_9595cbcd-18f3-463f-bb48-a1df0dfb6947",
+              "size": [
+                256,
+                256
+              ]
+            }
+          ]
+        }
+      ],
+      "size_studs": {
+        "x": 1.644,
+        "y": 2.5,
+        "z": 2.062
+      },
+      "problems": []
+    },
+    "obj": {
+      "ok": true,
+      "total_triangles": 2500,
+      "open_edges": 0,
+      "meshes": [
+        {
+          "name": "input",
+          "triangles": 2500,
+          "textures": [
+            {
+              "name": "CandyBackpack_0.png",
+              "size": [
+                256,
+                256
+              ]
+            },
+            {
+              "name": "CandyBackpack_2.png",
+              "size": [
+                256,
+                256
+              ]
+            }
+          ]
+        }
+      ],
+      "size_studs": {
+        "x": 1.644,
+        "y": 2.5,
+        "z": 2.062
+      },
+      "problems": []
+    },
+    "glb": {
+      "ok": true,
+      "total_triangles": 2500,
+      "open_edges": 0,
+      "meshes": [
+        {
+          "name": "input",
+          "triangles": 2500,
+          "textures": [
+            {
+              "name": "CandyBackpack_0",
+              "size": [
+                256,
+                256
+              ]
+            },
+            {
+              "name": "CandyBackpack_1",
+              "size": [
+                256,
+                256
+              ]
+            },
+            {
+              "name": "CandyBackpack_2",
+              "size": [
+                256,
+                256
+              ]
+            }
+          ]
+        }
+      ],
+      "size_studs": {
+        "x": 1.644,
+        "y": 2.5,
+        "z": 2.062
+      },
+      "problems": []
+    }
+  },
+  "roblox_ready": true
+}

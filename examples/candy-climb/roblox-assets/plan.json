@@ -1,0 +1,26 @@
+{
+  "game": "Candy Climb",
+  "genre": "obby",
+  "style": {
+    "genStyleId": "Roblox",
+    "promptSuffix": "candy land theme, glossy sugar coating, pastel pink, mint and lemon colours, chunky rounded shapes, single object, centered, game asset"
+  },
+  "assets": [
+    { "name": "GumdropPlatform", "role": "platform", "prompt": "a wide round gumdrop platform with a flat top you can stand on, sugar crystals on the sides", "longestStuds": 10, "triBudget": 3000, "collision": "PreciseConvexDecomposition", "count": 12 },
+    { "name": "WrappedCandy", "role": "collectible", "prompt": "a single wrapped hard candy with twisted wrapper ends", "longestStuds": 2.5, "triBudget": 800, "collision": "Box", "count": 12 },
+    { "name": "CupcakeCheckpoint", "role": "checkpoint", "prompt": "a giant cupcake with a small flag on top made of a wafer", "heightStuds": 6, "triBudget": 4000, "collision": "Hull", "count": 4 },
+    { "name": "LollipopTree", "role": "decor", "prompt": "a tall swirl lollipop tree with a striped candy cane trunk", "heightStuds": 16, "triBudget": 3000, "collision": "Hull", "count": 14 },
+    { "name": "GiantCake", "role": "finish", "prompt": "a three-tier celebration cake with dripping icing and a cherry on top", "heightStuds": 12, "triBudget": 12000, "collision": "PreciseConvexDecomposition", "count": 1 },
+    { "name": "CandyShopStand", "role": "shop", "prompt": "a small candy market stall with a striped awning and jars of sweets on the counter", "heightStuds": 9, "triBudget": 8000, "collision": "Hull", "count": 1 },
+    { "name": "CandyBackpack", "role": "cosmetic", "prompt": "a cute backpack shaped like a pink gummy bear", "heightStuds": 2.5, "triBudget": 2500, "collision": "Box", "count": 1 }
+  ],
+  "variants": [
+    { "base": "CandyBackpack", "name": "CandyBackpack_Mint", "displayName": "Mint Swirl", "prompt": "mint green and white peppermint swirl, glossy hard candy", "price": 15 },
+    { "base": "CandyBackpack", "name": "CandyBackpack_Chocolate", "displayName": "Choco Fudge", "prompt": "rich milk chocolate with fudge drizzle and rainbow sprinkles", "price": 30 },
+    { "base": "CandyBackpack", "name": "CandyBackpack_Galaxy", "displayName": "Galaxy Gummy", "prompt": "translucent purple and blue galaxy gummy with tiny glitter stars", "price": 60 }
+  ],
+  "skybox": {
+    "prompt": "pastel candy land sky at golden hour, pink and peach cotton candy clouds, distant lollipop hills and a chocolate river on the horizon",
+    "genStyleId": "CozyMobile"
+  }
+}
