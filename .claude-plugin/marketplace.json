@@ -1,0 +1,17 @@
+{
+  "name": "sloyd-roblox-studio-team",
+  "owner": {
+    "name": "Sloyd",
+    "url": "https://www.sloyd.ai"
+  },
+  "metadata": {
+    "description": "Sloyd skill teams for coding agents."
+  },
+  "plugins": [
+    {
+      "name": "roblox-studio",
+      "description": "Roblox Studio Team: design doc, Sloyd 3D props under Roblox limits, shop skins, skybox, Luau and Rojo, from one prompt to a playable place.",
+      "source": "./"
+    }
+  ]
+}

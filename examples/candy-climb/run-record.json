@@ -1,0 +1,559 @@
+{
+  "schema": "sloyd-roblox-studio/run-record@1",
+  "game": "Candy Climb",
+  "genre": "obby",
+  "genStyleId": "Roblox",
+  "textureResolution": "1k",
+  "topology": "triangles",
+  "createdAt": "2026-11-04T16:30:00Z",
+  "assets": [
+    {
+      "name": "GumdropPlatform",
+      "role": "platform",
+      "triBudget": 3000,
+      "collision": "PreciseConvexDecomposition",
+      "job": {
+        "tool": "generate_3d_from_text",
+        "args": {
+          "prompt": "a wide round gumdrop platform with a flat top you can stand on, sugar crystals on the sides, candy land theme, glossy sugar coating, pastel pink, mint and lemon colours, chunky rounded shapes, single object, centered, game asset",
+          "genStyleId": "Roblox",
+          "topology": "triangles",
+          "targetFaceCount": 3000,
+          "textureResolution": "1k"
+        },
+        "estimate": 25,
+        "status": "success",
+        "attempts": 1
+      },
+      "export": {
+        "roblox": {
+          "files": [
+            "GumdropPlatform.fbx",
+            "GumdropPlatform.obj",
+            "GumdropPlatform.glb"
+          ],
+          "trianglesRaw": 3000,
+          "triangles": 3000,
+          "sizeStuds": [
+            9.962,
+            2.505,
+            10.0
+          ],
+          "pivot": "bottom-center",
+          "textureMaxPx": 512,
+          "texturesDownscaled": [
+            [
+              1024,
+              512
+            ],
+            [
+              2048,
+              512
+            ]
+          ],
+          "openEdges": 0,
+          "ready": true
+        }
+      },
+      "render": "images/renders/GumdropPlatform.png"
+    },
+    {
+      "name": "WrappedCandy",
+      "role": "collectible",
+      "triBudget": 800,
+      "collision": "Box",
+      "job": {
+        "tool": "generate_3d_from_text",
+        "args": {
+          "prompt": "a single wrapped hard candy with twisted wrapper ends, candy land theme, glossy sugar coating, pastel pink, mint and lemon colours, chunky rounded shapes, single object, centered, game asset",
+          "genStyleId": "Roblox",
+          "topology": "triangles",
+          "targetFaceCount": 800,
+          "textureResolution": "1k"
+        },
+        "estimate": 25,
+        "status": "success",
+        "attempts": 1
+      },
+      "export": {
+        "roblox": {
+          "files": [
+            "WrappedCandy.fbx",
+            "WrappedCandy.obj",
+            "WrappedCandy.glb"
+          ],
+          "trianglesRaw": 1000,
+          "triangles": 784,
+          "sizeStuds": [
+            2.5,
+            0.964,
+            0.8
+          ],
+          "pivot": "bottom-center",
+          "textureMaxPx": 256,
+          "texturesDownscaled": [
+            [
+              1024,
+              256
+            ],
+            [
+              2048,
+              256
+            ]
+          ],
+          "openEdges": 0,
+          "ready": true
+        }
+      },
+      "render": "images/renders/WrappedCandy.png"
+    },
+    {
+      "name": "CupcakeCheckpoint",
+      "role": "checkpoint",
+      "triBudget": 4000,
+      "collision": "Hull",
+      "job": {
+        "tool": "generate_3d_from_text",
+        "args": {
+          "prompt": "a giant cupcake with a small flag on top made of a wafer, candy land theme, glossy sugar coating, pastel pink, mint and lemon colours, chunky rounded shapes, single object, centered, game asset",
+          "genStyleId": "Roblox",
+          "topology": "triangles",
+          "targetFaceCount": 4000,
+          "textureResolution": "1k"
+        },
+        "estimate": 25,
+        "status": "success",
+        "attempts": 1
+      },
+      "export": {
+        "roblox": {
+          "files": [
+            "CupcakeCheckpoint.fbx",
+            "CupcakeCheckpoint.obj",
+            "CupcakeCheckpoint.glb"
+          ],
+          "trianglesRaw": 4000,
+          "triangles": 4000,
+          "sizeStuds": [
+            4.507,
+            6.0,
+            4.508
+          ],
+          "pivot": "bottom-center",
+          "textureMaxPx": 512,
+          "texturesDownscaled": [
+            [
+              1024,
+              512
+            ],
+            [
+              2048,
+              512
+            ]
+          ],
+          "openEdges": 0,
+          "ready": true
+        }
+      },
+      "render": "images/renders/CupcakeCheckpoint.png"
+    },
+    {
+      "name": "LollipopTree",
+      "role": "decor",
+      "triBudget": 3000,
+      "collision": "Hull",
+      "job": {
+        "tool": "generate_3d_from_text",
+        "args": {
+          "prompt": "a tall swirl lollipop tree with a striped candy cane trunk, candy land theme, glossy sugar coating, pastel pink, mint and lemon colours, chunky rounded shapes, single object, centered, game asset",
+          "genStyleId": "Roblox",
+          "topology": "triangles",
+          "targetFaceCount": 3000,
+          "textureResolution": "1k"
+        },
+        "estimate": 25,
+        "status": "success",
+        "attempts": 1
+      },
+      "export": {
+        "roblox": {
+          "files": [
+            "LollipopTree.fbx",
+            "LollipopTree.obj",
+            "LollipopTree.glb"
+          ],
+          "trianglesRaw": 3000,
+          "triangles": 3000,
+          "sizeStuds": [
+            8.009,
+            16.0,
+            8.009
+          ],
+          "pivot": "bottom-center",
+          "textureMaxPx": 1024,
+          "texturesDownscaled": [
+            [
+              2048,
+              1024
+            ]
+          ],
+          "openEdges": 0,
+          "ready": true
+        }
+      },
+      "render": "images/renders/LollipopTree.png"
+    },
+    {
+      "name": "GiantCake",
+      "role": "finish",
+      "triBudget": 12000,
+      "collision": "PreciseConvexDecomposition",
+      "job": {
+        "tool": "generate_3d_from_text",
+        "args": {
+          "prompt": "a three-tier celebration cake with dripping icing and a cherry on top, candy land theme, glossy sugar coating, pastel pink, mint and lemon colours, chunky rounded shapes, single object, centered, game asset",
+          "genStyleId": "Roblox",
+          "topology": "triangles",
+          "targetFaceCount": 12000,
+          "textureResolution": "1k"
+        },
+        "estimate": 25,
+        "status": "success",
+        "attempts": 1
+      },
+      "export": {
+        "roblox": {
+          "files": [
+            "GiantCake.fbx",
+            "GiantCake.obj",
+            "GiantCake.glb"
+          ],
+          "trianglesRaw": 11999,
+          "triangles": 11999,
+          "sizeStuds": [
+            13.714,
+            12.0,
+            13.714
+          ],
+          "pivot": "bottom-center",
+          "textureMaxPx": 1024,
+          "texturesDownscaled": [
+            [
+              2048,
+              1024
+            ]
+          ],
+          "openEdges": 21,
+          "ready": true
+        }
+      },
+      "render": "images/renders/GiantCake.png"
+    },
+    {
+      "name": "CandyShopStand",
+      "role": "shop",
+      "triBudget": 8000,
+      "collision": "Hull",
+      "job": {
+        "tool": "generate_3d_from_text",
+        "args": {
+          "prompt": "a small candy market stall with a striped awning and jars of sweets on the counter, candy land theme, glossy sugar coating, pastel pink, mint and lemon colours, chunky rounded shapes, single object, centered, game asset",
+          "genStyleId": "Roblox",
+          "topology": "triangles",
+          "targetFaceCount": 8000,
+          "textureResolution": "1k"
+        },
+        "estimate": 25,
+        "status": "success",
+        "attempts": 1
+      },
+      "export": {
+        "roblox": {
+          "files": [
+            "CandyShopStand.fbx",
+            "CandyShopStand.obj",
+            "CandyShopStand.glb"
+          ],
+          "trianglesRaw": 8000,
+          "triangles": 8000,
+          "sizeStuds": [
+            9.569,
+            9.0,
+            8.518
+          ],
+          "pivot": "bottom-center",
+          "textureMaxPx": 512,
+          "texturesDownscaled": [
+            [
+              1024,
+              512
+            ],
+            [
+              1024,
+              512
+            ],
+            [
+              1024,
+              512
+            ]
+          ],
+          "openEdges": 0,
+          "ready": true
+        }
+      },
+      "render": "images/renders/CandyShopStand.png"
+    },
+    {
+      "name": "CandyBackpack",
+      "role": "cosmetic",
+      "triBudget": 2500,
+      "collision": "Box",
+      "job": {
+        "tool": "generate_3d_from_text",
+        "args": {
+          "prompt": "a cute backpack shaped like a pink gummy bear, candy land theme, glossy sugar coating, pastel pink, mint and lemon colours, chunky rounded shapes, single object, centered, game asset",
+          "genStyleId": "Roblox",
+          "topology": "triangles",
+          "targetFaceCount": 2500,
+          "textureResolution": "1k"
+        },
+        "estimate": 25,
+        "status": "success",
+        "attempts": 1
+      },
+      "export": {
+        "roblox": {
+          "files": [
+            "CandyBackpack.fbx",
+            "CandyBackpack.obj",
+            "CandyBackpack.glb"
+          ],
+          "trianglesRaw": 2500,
+          "triangles": 2500,
+          "sizeStuds": [
+            1.644,
+            2.5,
+            2.062
+          ],
+          "pivot": "bottom-center",
+          "textureMaxPx": 256,
+          "texturesDownscaled": [
+            [
+              1024,
+              256
+            ],
+            [
+              1024,
+              256
+            ],
+            [
+              1024,
+              256
+            ]
+          ],
+          "openEdges": 0,
+          "ready": true
+        }
+      },
+      "render": "images/renders/CandyBackpack.png"
+    },
+    {
+      "name": "CandyBackpack_Mint",
+      "role": "cosmetic",
+      "variantOf": "CandyBackpack",
+      "displayName": "Mint Swirl",
+      "price": 15,
+      "triBudget": 2500,
+      "collision": "Box",
+      "job": {
+        "tool": "retexture_model",
+        "args": {
+          "base": "CandyBackpack",
+          "prompt": "mint green and white peppermint swirl, glossy hard candy",
+          "textureResolution": "1k"
+        },
+        "estimate": 15,
+        "status": "success",
+        "attempts": 1
+      },
+      "export": {
+        "roblox": {
+          "files": [
+            "CandyBackpack_Mint.fbx",
+            "CandyBackpack_Mint.obj",
+            "CandyBackpack_Mint.glb"
+          ],
+          "trianglesRaw": 2500,
+          "triangles": 2500,
+          "sizeStuds": [
+            1.644,
+            2.5,
+            2.062
+          ],
+          "pivot": "bottom-center",
+          "textureMaxPx": 256,
+          "texturesDownscaled": [
+            [
+              1024,
+              256
+            ],
+            [
+              1024,
+              256
+            ]
+          ],
+          "openEdges": 0,
+          "ready": true
+        }
+      },
+      "render": "images/renders/CandyBackpack_Mint.png"
+    },
+    {
+      "name": "CandyBackpack_Chocolate",
+      "role": "cosmetic",
+      "variantOf": "CandyBackpack",
+      "displayName": "Choco Fudge",
+      "price": 30,
+      "triBudget": 2500,
+      "collision": "Box",
+      "job": {
+        "tool": "retexture_model",
+        "args": {
+          "base": "CandyBackpack",
+          "prompt": "rich milk chocolate with fudge drizzle and rainbow sprinkles",
+          "textureResolution": "1k"
+        },
+        "estimate": 15,
+        "status": "success",
+        "attempts": 1
+      },
+      "export": {
+        "roblox": {
+          "files": [
+            "CandyBackpack_Chocolate.fbx",
+            "CandyBackpack_Chocolate.obj",
+            "CandyBackpack_Chocolate.glb"
+          ],
+          "trianglesRaw": 2500,
+          "triangles": 2500,
+          "sizeStuds": [
+            1.644,
+            2.5,
+            2.062
+          ],
+          "pivot": "bottom-center",
+          "textureMaxPx": 256,
+          "texturesDownscaled": [
+            [
+              1024,
+              256
+            ],
+            [
+              1024,
+              256
+            ]
+          ],
+          "openEdges": 0,
+          "ready": true
+        }
+      },
+      "render": "images/renders/CandyBackpack_Chocolate.png"
+    },
+    {
+      "name": "CandyBackpack_Galaxy",
+      "role": "cosmetic",
+      "variantOf": "CandyBackpack",
+      "displayName": "Galaxy Gummy",
+      "price": 60,
+      "triBudget": 2500,
+      "collision": "Box",
+      "job": {
+        "tool": "retexture_model",
+        "args": {
+          "base": "CandyBackpack",
+          "prompt": "translucent purple and blue galaxy gummy with tiny glitter stars",
+          "textureResolution": "1k"
+        },
+        "estimate": 15,
+        "status": "success",
+        "attempts": 1
+      },
+      "export": {
+        "roblox": {
+          "files": [
+            "CandyBackpack_Galaxy.fbx",
+            "CandyBackpack_Galaxy.obj",
+            "CandyBackpack_Galaxy.glb"
+          ],
+          "trianglesRaw": 2500,
+          "triangles": 2500,
+          "sizeStuds": [
+            1.644,
+            2.5,
+            2.062
+          ],
+          "pivot": "bottom-center",
+          "textureMaxPx": 256,
+          "texturesDownscaled": [
+            [
+              1024,
+              256
+            ],
+            [
+              1024,
+              256
+            ]
+          ],
+          "openEdges": 0,
+          "ready": true
+        }
+      },
+      "render": "images/renders/CandyBackpack_Galaxy.png"
+    }
+  ],
+  "skybox": {
+    "job": {
+      "tool": "generate_skybox",
+      "args": {
+        "prompt": "pastel candy land sky at golden hour, pink and peach cotton candy clouds, distant lollipop hills and a chocolate river on the horizon",
+        "genStyleId": "CozyMobile"
+      },
+      "estimate": 25,
+      "status": "success",
+      "attempts": 1
+    },
+    "export": {
+      "roblox": {
+        "faces": [
+          "SkyboxBk",
+          "SkyboxDn",
+          "SkyboxFt",
+          "SkyboxLf",
+          "SkyboxRt",
+          "SkyboxUp"
+        ],
+        "facePx": 1024
+      }
+    },
+    "render": "images/sky-cross.png"
+  },
+  "totals": {
+    "jobs": 11,
+    "succeeded": 11,
+    "failed": 0,
+    "robloxReady": 10,
+    "meshes": 10
+  },
+  "spend": {
+    "note": "Real balance change on the API key for this run",
+    "startBalance": 415,
+    "endBalance": 170,
+    "credits": 245,
+    "breakdown": {
+      "7 text-to-3D props (25 each)": 175,
+      "3 backpack retextures (15 each)": 45,
+      "1 skybox": 25
+    }
+  },
+  "note": "Record of the launch run. Model, variant and skybox jobIds and download URLs are removed on purpose; renders are kept. To make this game yourself, run plan.json with your own Sloyd key."
+}

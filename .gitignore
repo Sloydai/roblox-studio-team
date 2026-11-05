@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+.DS_Store
+# Generated 3D models, textures and builds never go in this repo (renders only)
+*.glb
+*.gltf
+*.fbx
+*.obj
+*.mtl
+*.rbxl
+*.rbxlx
+roblox-assets/
+roblox-game/
+sourcemap.json
