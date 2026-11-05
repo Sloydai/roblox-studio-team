@@ -1,4 +1,0 @@
-# Pins the Rojo version for this project. Install Rokit (github.com/rojo-rbx/rokit),
-# then run `rokit install` here. Match the Rojo Studio plugin to this version.
-[tools]
-rojo = "rojo-rbx/rojo@7.7.1"

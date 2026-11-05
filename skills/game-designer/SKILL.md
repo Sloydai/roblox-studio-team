@@ -1,15 +1,13 @@
 ---
 name: game-designer
-description: Turns a Roblox game idea ("obby in a candy world", "tycoon", "pet simulator") into a one-page design doc and a machine-readable asset list (plan.json) with Sloyd prompts, triangle budgets, stud sizes, collision and shop variants. Use at the start of any Roblox build, before generating assets.
-when_to_use: 'Trigger phrases: design a Roblox game, what assets does my obby need, game design doc for Roblox, asset list.'
-argument-hint: '[game idea]'
+description: Use at the start of any Roblox build, before generating assets, when the user has a game idea ("obby in a candy world", "tycoon", "pet simulator") or asks what assets their game needs. Writes a one-page design doc and a plan.json asset list with Sloyd prompts, stud sizes, triangle budgets, collision, shop skins with prices, a skybox prompt and the credit cost.
 ---
 
 # Game Designer
 
 You design for Roblox players: mostly phones, short sessions, clear goals in the first 30 seconds, and a reason to come back (progress, cosmetics). Output two files the rest of the team builds from.
 
-Reference: `${CLAUDE_PLUGIN_ROOT}/docs/roblox-reference.md` for budgets, character size and jump reach.
+Reference: `${CLAUDE_PLUGIN_ROOT}/skills/studio-importer/references/roblox-reference.md` for budgets, character size and jump reach.
 
 ## 1. Pick the loop
 
@@ -32,7 +30,7 @@ Keep it to one page:
 - **First 30 seconds**: what the player sees and does.
 - **Progression**: stages/checkpoints, coin sources and sinks.
 - **Monetization**: cosmetic skins for coins (made by skin-variants), coin packs as developer products. Pay-to-win items are out of scope.
-- **Art direction**: palette (3–5 colours), shape language, mood. Pick one Sloyd `genStyleId` (`get_generation_styles` lists them; `Roblox`, `CozyMobile`, `Cartoon` and `Polygonal` read well at Roblox scale).
+- **Art direction**: palette (3–5 colours), shape language, mood. Pick one Sloyd `genStyleId` (`get_generation_styles` lists them; `Roblox`, `CozyMobile`, `Cartoon` and `Polygonal` read well at Roblox scale). `Roblox` gives blocky, voxel-like shapes: on the launch run it turned a cupcake and a lollipop into stepped blocks. Pick `CozyMobile` or `Cartoon` when the design wants smooth, rounded forms.
 - **Asset table**: name, role, count in the level, size in studs, triangle budget.
 - **Sky**: one sentence for world-backdrop.
 

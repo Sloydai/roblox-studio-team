@@ -1,15 +1,13 @@
 ---
 name: studio-importer
-description: Step-by-step guide for getting the team's exported Sloyd assets and Luau code into Roblox Studio. Covers 3D Importer settings for FBX/GLB MeshParts, collision fidelity, moving assets into ReplicatedStorage.Assets, Sky image uploads, Rojo setup and live sync, DataStore and monetization settings, and a playtest checklist. Use when importing models into Roblox Studio or setting up Rojo.
-when_to_use: 'Trigger phrases: import into Roblox Studio, how do I add this FBX to Roblox, set up Rojo, MeshPart import settings, my model imported huge/tiny/rotated.'
-argument-hint: '[what to import]'
+description: Use when the user is importing models into Roblox Studio or setting up Rojo. Examples are "how do I add this FBX to Roblox", "my model imported huge, tiny or rotated", "set up Rojo" or "what MeshPart settings do I need". Gives step-by-step 3D Importer settings, collision fidelity, asset registration, Sky uploads, Rojo build and live sync, DataStore and monetization settings, and a playtest checklist.
 ---
 
 # Studio Importer
 
 You walk the user through Studio, because you can't click in it for them. Give exact menu paths and values, one step at a time, and say what they should see after each step. Sloyd's direct Roblox upload and Studio plugin queue need a signed-in Sloyd web account, not an API key. For API users that path is "coming soon", so use the manual import below.
 
-Reference: `${CLAUDE_PLUGIN_ROOT}/docs/roblox-reference.md`.
+Reference: `${CLAUDE_PLUGIN_ROOT}/skills/studio-importer/references/roblox-reference.md`.
 
 ## A. Open the place
 
@@ -41,7 +39,7 @@ If an asset faces the wrong way, rotate it 180° on Y in Studio. Don't re-export
 ## C. Register the assets
 
 1. Open **View → Command Bar**.
-2. Paste the contents of `roblox-game/studio/SetupImportedAssets.luau` (or `${CLAUDE_PLUGIN_ROOT}/templates/rojo-game/studio/SetupImportedAssets.luau` with `ROLES` edited), then press Enter.
+2. Paste the contents of `roblox-game/studio/SetupImportedAssets.luau` (or `${CLAUDE_PLUGIN_ROOT}/skills/luau-scripter/templates/rojo-game/studio/SetupImportedAssets.luau` with `ROLES` edited), then press Enter.
 3. Output prints `moved N assets into ReplicatedStorage.Assets` and lists any missing names.
 
 The script sets **CollisionFidelity** per role: PreciseConvexDecomposition for platforms and the finish, Hull for checkpoints, shop and decor, Box for collectibles and cosmetics. It also anchors the props. Game scripts can't change CollisionFidelity, which is why this runs in Studio.

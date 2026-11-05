@@ -1,7 +1,8 @@
 {
   "name": "roblox-studio",
+  "displayName": "Roblox Studio Team",
+  "description": "A Roblox game studio for your coding agent, powered by the Sloyd API: game designer, prop modeler, skin variants, world backdrop, Luau scripter and Studio importer. One prompt to a playable Roblox place with custom 3D assets under Roblox's limits, shop skins and a custom sky.",
   "version": "0.1.0",
-  "description": "Roblox Studio Team: seven Claude skills that turn a game idea into a playable Roblox place with custom Sloyd-generated 3D assets, shop skins and a skybox.",
   "author": {
     "name": "Sloyd",
     "url": "https://www.sloyd.ai"
@@ -11,5 +12,16 @@
   "license": "MIT",
   "icon": ".claude-plugin/icon.png",
   "privacyPolicyUrl": "https://www.sloyd.ai/privacy-policy",
-  "keywords": ["roblox", "roblox-studio", "luau", "rojo", "3d", "game-assets", "sloyd", "obby", "tycoon"]
+  "keywords": [
+    "roblox",
+    "roblox-studio",
+    "luau",
+    "rojo",
+    "3d",
+    "gamedev",
+    "sloyd",
+    "obby",
+    "meshpart",
+    "fbx"
+  ]
 }

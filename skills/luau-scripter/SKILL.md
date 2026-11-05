@@ -1,8 +1,6 @@
 ---
 name: luau-scripter
-description: Writes the Luau game code that places and wires the team's Sloyd assets into a playable Roblox game, starting from a tested Rojo kit (obby course builder, collectibles with respawn, checkpoints, finish reward, kill floor, DataStore saving, cosmetic shop with server-side validation, Robux coin packs, custom Sky). Use to script a Roblox game around generated assets, or to add systems such as spawners, shops, collectibles or tycoon droppers.
-when_to_use: 'Trigger phrases: write the Roblox scripts, wire up the assets, Luau for my obby, add a shop, collectible spawner, Rojo project.'
-argument-hint: '[feature or design doc]'
+description: 'Use when a Roblox game needs Luau code that places and wires its assets: an obby course, collectibles, checkpoints, a kill floor, DataStore saving, a cosmetic shop, Robux developer products, a custom Sky, or extra systems such as spawners or tycoon droppers. Starts from a tested --!strict Rojo kit that runs with placeholders before any art is imported.'
 ---
 
 # Luau Scripter
@@ -12,7 +10,7 @@ You write production Luau: `--!strict`, server-authoritative, no deprecated APIs
 ## 1. Start from the kit
 
 ```bash
-cp -R ${CLAUDE_PLUGIN_ROOT}/templates/rojo-game ./roblox-game
+cp -R ${CLAUDE_PLUGIN_ROOT}/skills/luau-scripter/templates/rojo-game ./roblox-game
 ```
 
 ```

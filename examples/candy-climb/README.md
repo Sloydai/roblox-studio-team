@@ -1,42 +1,64 @@
-# Candy Climb: the launch demo
+# Candy Climb (candy obby)
 
-The team's real run for "obby in a candy world", on 2026-11-04. 11 Sloyd jobs, 245 credits (balance 415 → 170). All 11 succeeded on the first try.
+A real game, made end to end by the Roblox Studio Team skills with the Sloyd API on 2026-11-04, from the prompt "obby in a candy world". Every image below is a render of an actual exported model from that run. `run-record.json` lists every asset's prompt, triangle count, size in studs, texture size and the credit spend.
 
-## What it made
+![All 7 props](images/props-sheet.png)
 
-| Asset | Role | Triangles | Size (studs, X×Y×Z) | Texture | Sloyd job |
-|---|---|---|---|---|---|
-| GumdropPlatform | platform | 3,000 | 9.96 × 2.5 × 10.0 | 512 | `4lbmlnci` |
-| WrappedCandy | collectible | 784 | 2.5 × 0.96 × 0.8 | 256 | `vxxhjvam` |
-| CupcakeCheckpoint | checkpoint | 4,000 | 4.51 × 6.0 × 4.51 | 512 | `gg7xqu0g` |
-| LollipopTree | decor | 3,000 | 8.01 × 16.0 × 8.01 | 1024 | `g7j5uuwj` |
-| GiantCake | finish | 11,999 | 13.71 × 12.0 × 13.71 | 1024 | `gai4ysca` |
-| CandyShopStand | shop | 8,000 | 9.57 × 9.0 × 8.52 | 512 | `g9dp2s3c` |
-| CandyBackpack (Classic, free) | cosmetic | 2,500 | 1.64 × 2.5 × 2.06 | 256 | `sdmxlt64` |
-| CandyBackpack_Mint (15 coins) | cosmetic | 2,500 | same | 256 | `iv4zq3m4` |
-| CandyBackpack_Chocolate (30) | cosmetic | 2,500 | same | 256 | `7928gabp` |
-| CandyBackpack_Galaxy (60) | cosmetic | 2,500 | same | 256 | `wg1m6q9d` |
-| Sky (6 faces, 1024 px) | sky | none | none | 1024 | `n0bbe2c3` |
+## Numbers
 
-- Sloyd honoured every `targetFaceCount`, so no decimation was needed. The exporter cut textures from 1024–2048 px down to Roblox's size guidance, set studs and a ground pivot, and verified every FBX, OBJ and GLB by re-importing it.
-- Previews: `roblox-assets/previews/` (`props_sheet.png`, `skins_sheet.png`). Sky faces: `roblox-assets/sky/` (`preview_cross.png`).
-- Game: `roblox-game/` is the Rojo kit with these real sizes in `GameConfig.luau`. It builds to `roblox-game/SloydGame.rbxlx` and type-checks with 0 errors.
-- Raw GLBs aren't committed. Each one is at `https://storage.googleapis.com/ai-services-quality/jobs/<jobId>.glb`.
+| | |
+|---|---|
+| Props | 7: gumdrop platform, wrapped candy, cupcake checkpoint, lollipop tree, giant cake, candy shop stand, gummy bear backpack |
+| Shop skins | 3 retextures of the backpack: Mint Swirl (15 coins), Choco Fudge (30), Galaxy Gummy (60) |
+| Sky | 1 skybox, converted to six 1024 px Roblox Sky faces |
+| Style | `Roblox` for props and `CozyMobile` for the sky; triangles; 1k textures |
+| Triangle budgets | 784 (candy) to 11,999 (cake). Every mesh is under 20,000 |
+| Failed jobs | 0 of 11 |
+| Roblox-ready | 10 of 10 meshes, each verified by re-importing the exported FBX, OBJ and GLB |
+| Credits | **245** (~$3.27), measured on the key: balance 415 → 170 |
 
-## Play it in Studio (needs Windows or macOS)
+| Step | Credits |
+|---|---|
+| 7 text-to-3D props (25 each) | 175 |
+| 3 backpack retextures (15 each) | 45 |
+| 1 skybox | 25 |
 
-1. Open `roblox-game/SloydGame.rbxlx` and press Play. The course works with placeholder blocks.
-2. File → Import every `roblox-assets/export/*/*.fbx` (Scale Unit: Stud, Merge Meshes on).
-3. View → Command Bar, then paste `roblox-game/studio/SetupImportedAssets.luau`.
-4. Asset Manager → Bulk Import `roblox-assets/sky/Skybox*.png`, then put the ids in `GameConfig.Sky`.
-5. Press Play again.
+## What the pipeline caught
 
-## Re-run it
+- **Textures were oversized for Roblox.** Sloyd returned 1024–2048 px textures even with `textureResolution: "1k"`. The exporter sized each one by stud size: 256 px for the candy and the backpacks, 512 for the platform, cupcake and stand, and 1024 for the tree and cake.
+- **No decimation was needed.** Sloyd met every `targetFaceCount` exactly. The decimator stays in place for models that arrive over budget, or for your own FBX files.
+- **GiantCake has 21 open edges** after export. That's under the warning threshold, and it imports normally.
+- **The `Roblox` style is blocky.** It turned the cupcake and the lollipop tree into stepped, voxel-like shapes, and the cake into plain boxes. The game-designer skill now says to pick `CozyMobile` or `Cartoon` when a design wants smooth, rounded forms.
 
-```bash
-python3 ../../scripts/sloyd_api.py run roblox-assets/plan.json --out roblox-assets   # resumes from run_state.json
-python3 ../../scripts/roblox_mesh.py batch roblox-assets/manifest.json
-python3 ../../scripts/roblox_sky.py --job roblox-assets/sky/sky_job.json --out roblox-assets/sky
+![Backpack skins](images/skins-sheet.png)
+
+*Same mesh and fit, four looks: Classic (free), Mint Swirl, Choco Fudge and Galaxy Gummy.*
+
+![Sky faces](images/sky-cross.png)
+
+*The six Sky faces laid out as a cross (preview at 256 px per face). The horizon and the chocolate river line up across Left, Front, Right and Back.*
+
+## Files
+
+```
+design-doc.md          pitch, loop, economy, art direction, asset table, cost
+plan.json              the plan the run executed (prompts, roles, studs, budgets, skins, sky)
+run-record.json        every asset: tool and settings, triangles, studs, texture size, spend
+images/                contact sheets, the sky cross and one render per asset (renders/)
+export/roblox/IMPORT.md  every file the run exported, with triangles, size, texture and collision
+GameConfig.luau        the luau-scripter config filled in with this run's real sizes
 ```
 
-Delete `roblox-assets/run_state.json` to generate fresh assets (costs 245 credits again).
+The 3D models, textures and sky faces aren't included. The renders are, so you can judge the quality. To make this game, or your own version of it, run the plan with your own Sloyd key. It costs 245 credits.
+
+```bash
+mkdir -p roblox-assets && cp examples/candy-climb/plan.json roblox-assets/
+python3 skills/sloyd-api/scripts/sloyd.py estimate roblox-assets/plan.json
+python3 skills/sloyd-api/scripts/sloyd.py run roblox-assets/plan.json --out roblox-assets
+BLENDER=/path/to/blender python3 skills/prop-modeler/scripts/roblox_mesh.py batch roblox-assets/manifest.json
+python3 skills/world-backdrop/scripts/roblox_sky.py --job roblox-assets/sky/sky_job.json --out roblox-assets/sky
+cp -R skills/luau-scripter/templates/rojo-game roblox-game && cp examples/candy-climb/GameConfig.luau roblox-game/src/shared/
+(cd roblox-game && rojo build default.project.json -o SloydGame.rbxlx)
+```
+
+Or, in Claude Code: `/roblox-studio:roblox-producer build the plan in roblox-assets/plan.json`. Then follow [export/roblox/IMPORT.md](export/roblox/IMPORT.md).

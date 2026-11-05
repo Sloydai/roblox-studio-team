@@ -1,15 +1,13 @@
 ---
 name: roblox-producer
-description: Orchestrates the Roblox Studio Team end to end, from a one-line game idea ("obby in a candy world", "pet tycoon") to a playable Roblox place with custom Sloyd 3D assets, shop skins, a skybox, Luau scripts and a Rojo project. Use when someone wants to build a Roblox game, level or asset pack with AI-generated 3D models.
-when_to_use: 'Trigger phrases: make me a Roblox game, build an obby, Roblox tycoon with custom models, generate Roblox assets with Sloyd, turn this idea into a Roblox place.'
-argument-hint: '[game idea]'
+description: Use when the user wants a Roblox game built end to end in one request. Examples are "make me a Roblox obby in a candy world", "build a tycoon with custom models", "turn this idea into a Roblox place" or "be my Roblox studio". Orchestrates the whole Roblox Studio Team with Sloyd (design doc, 3D props under Roblox limits, shop skins, skybox, Luau and Rojo) and ends in a playable place plus importable assets. For a single asset or one step, use the specific role skill instead.
 ---
 
 # Roblox Producer
 
-You run a small studio of six specialist skills. Your job is sequencing, budget and hand-offs. Each specialist owns its files; you check each hand-off before starting the next stage.
+You run a small studio of six specialist skills, with sloyd-api as shared plumbing. Your job is sequencing, budget and hand-offs. Each specialist owns its files; you check each hand-off before starting the next stage.
 
-Read first: `${CLAUDE_PLUGIN_ROOT}/docs/sloyd-api.md` (API rules) and `${CLAUDE_PLUGIN_ROOT}/docs/roblox-reference.md` (limits).
+Load the sloyd-api skill first (credentials, credits, job loop, errors), and read `${CLAUDE_PLUGIN_ROOT}/skills/studio-importer/references/roblox-reference.md` (Roblox limits).
 
 ## Pipeline
 
@@ -27,11 +25,12 @@ Stages 3 and 4 can run while 2 is still polling, as long as you keep to 5 Sloyd 
 ## Procedure
 
 1. **Preflight** (no credits spent):
-   - Check the Sloyd MCP tools are available (`get_credit_balance`). If not, tell the user to export `SLOYD_CLIENT_ID` / `SLOYD_CLIENT_SECRET` and restart Claude Code, or fall back to `scripts/sloyd_api.py`.
-   - Check Blender 3.6+ is installed (`python3 ${CLAUDE_PLUGIN_ROOT}/scripts/roblox_mesh.py --help` then a `check` on any GLB, or ask). It's needed for decimation and FBX.
+   - Check that `SLOYD_CLIENT_ID` and `SLOYD_CLIENT_SECRET` are set, without printing them (sloyd-api, section 1). If the balance is 0, say so before planning.
+   - Check the Sloyd MCP tools are available (`get_credit_balance`). If not, tell the user to export `SLOYD_CLIENT_ID` / `SLOYD_CLIENT_SECRET` and restart Claude Code, or fall back to `${CLAUDE_PLUGIN_ROOT}/skills/sloyd-api/scripts/sloyd.py`.
+   - Check Blender 3.6+ is installed (`python3 ${CLAUDE_PLUGIN_ROOT}/skills/prop-modeler/scripts/roblox_mesh.py --help` then a `check` on any GLB, or ask). It's needed for decimation and FBX.
    - Optional: Rojo 7.x (`rojo --version`). Without it, studio-importer gives the manual path.
 2. **Design**: invoke game-designer. Show the user the design doc summary and the asset table.
-3. **Budget gate**: total the credits from `plan.json` (or `sloyd_api.py estimate roblox-assets/plan.json`), call `get_credit_balance`, and show `jobs / credits / ~USD / balance`. Wait for an explicit yes. If the balance is short, offer a smaller plan: fewer decor types, or drop variants.
+3. **Budget gate**: total the credits from `plan.json` (or `python3 ${CLAUDE_PLUGIN_ROOT}/skills/sloyd-api/scripts/sloyd.py estimate roblox-assets/plan.json`), call `get_credit_balance`, and show `jobs / credits / ~USD / balance`. Wait for an explicit yes. If the balance is short, offer a smaller plan: fewer decor types, or drop variants.
 4. **Assets**: invoke prop-modeler. Then skin-variants and world-backdrop.
 5. **Gate**: every asset in `manifest.json` has `export.ready: true`. If not, fix it with prop-modeler (regenerate with a lower `targetFaceCount`, or re-run `roblox_mesh.py process` with a lower `--target-tris`). Never hand a model over 20,000 triangles to the importer.
 6. **Code**: invoke luau-scripter. Gate: `rojo build` succeeds; if `luau-lsp` is installed, `luau-lsp analyze` has no errors.

@@ -1,16 +1,13 @@
 ---
 name: skin-variants
-description: Creates cosmetic and shop-item variants of a Roblox asset with Sloyd's retexture_model (same mesh, new texture), exports them Roblox-ready and adds them to the game's shop with prices. Use for skins, colourways, seasonal or limited items, and anything sold for coins or Robux.
-when_to_use: 'Trigger phrases: make skins for my item, shop variants, colour variants, limited edition version, monetize with cosmetics.'
-argument-hint: '[base asset name] [variant ideas]'
-allowed-tools: Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/roblox_mesh.py *)
+description: 'Use when a Roblox item needs cosmetic or shop variants with the same shape: skins, colourways, seasonal or limited editions, rarity tiers, or anything sold for coins or Robux. Retextures the base model with Sloyd''s retexture_model, exports each skin Roblox-ready, and adds it to the game''s shop with a price ladder.'
 ---
 
 # Skin Variants
 
 Cosmetics are how most Roblox games earn without being pay-to-win. Retexturing keeps the mesh, so every variant has the same silhouette, triangle count and fit as the base, and only the look changes.
 
-Read `${CLAUDE_PLUGIN_ROOT}/docs/sloyd-api.md`.
+Load the sloyd-api skill first (credentials, credits, job loop, errors).
 
 ## Inputs
 
@@ -44,8 +41,8 @@ Poll `get_job` (`wait: 30`). Download `outputs.glbUrl` to `roblox-assets/raw/<Ba
 ## 3. Export and check
 
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/roblox_mesh.py batch roblox-assets/manifest.json --only <Base>_Mint,<Base>_Chocolate
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/roblox_mesh.py preview roblox-assets/export/<Base>_Mint/<Base>_Mint.glb --out roblox-assets/previews/<Base>_Mint.png
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/prop-modeler/scripts/roblox_mesh.py batch roblox-assets/manifest.json --only <Base>_Mint,<Base>_Chocolate
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/prop-modeler/scripts/roblox_mesh.py preview roblox-assets/export/<Base>_Mint/<Base>_Mint.glb --out roblox-assets/previews/<Base>_Mint.png
 ```
 
 Use the same `heightStuds` as the base so every skin attaches at the same offset.

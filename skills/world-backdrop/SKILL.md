@@ -1,16 +1,13 @@
 ---
 name: world-backdrop
-description: Generates a 360° skybox with Sloyd (generate_skybox, generate_skybox_from_image, edit_skybox) and converts it into the six cubemap faces of a Roblox Sky object (SkyboxBk/Dn/Ft/Lf/Rt/Up) with the right orientation, plus matching Lighting settings. Use for any custom Roblox sky or environment backdrop.
-when_to_use: 'Trigger phrases: custom skybox for Roblox, make a sky for my game, Roblox Sky cubemap, change the sky, sunset sky.'
-argument-hint: '[sky description]'
-allowed-tools: Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/roblox_sky.py *)
+description: Use when a Roblox game needs a custom sky or environment backdrop ("make a sunset sky for my game", "candy land skybox", "change the sky"). Generates a 360 skybox with Sloyd and converts it into the six faces of a Roblox Sky object (SkyboxBk/Dn/Ft/Lf/Rt/Up) with the right orientation, plus matching Lighting settings.
 ---
 
 # World Backdrop
 
 The sky is the cheapest way to make a Roblox game look like its own place: one job, six images, no triangles.
 
-Read `${CLAUDE_PLUGIN_ROOT}/docs/sloyd-api.md`.
+Load the sloyd-api skill first (credentials, credits, job loop, errors).
 
 ## 1. Prompt
 
@@ -28,8 +25,8 @@ Poll `get_job` (`wait: 30`) until done. Save the full `get_job` result to `roblo
 ## 3. Convert to Roblox faces
 
 ```bash
-python3 -m venv "${CLAUDE_PLUGIN_DATA}/venv" && "${CLAUDE_PLUGIN_DATA}/venv/bin/pip" install -q -r ${CLAUDE_PLUGIN_ROOT}/scripts/requirements.txt
-"${CLAUDE_PLUGIN_DATA}/venv/bin/python" ${CLAUDE_PLUGIN_ROOT}/scripts/roblox_sky.py --job roblox-assets/sky/sky_job.json --out roblox-assets/sky
+python3 -m venv "${CLAUDE_PLUGIN_DATA}/venv" && "${CLAUDE_PLUGIN_DATA}/venv/bin/pip" install -q -r ${CLAUDE_PLUGIN_ROOT}/skills/world-backdrop/scripts/requirements.txt
+"${CLAUDE_PLUGIN_DATA}/venv/bin/python" ${CLAUDE_PLUGIN_ROOT}/skills/world-backdrop/scripts/roblox_sky.py --job roblox-assets/sky/sky_job.json --out roblox-assets/sky
 ```
 
 (Skip the venv lines if Pillow and NumPy are already installed.)

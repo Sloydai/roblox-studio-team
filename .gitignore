@@ -1,14 +1,17 @@
-# Secrets
 .env
 .env.*
-# Python
+!.env.example
 __pycache__/
-.venv/
-# Rojo build outputs
+*.pyc
+.DS_Store
+# Generated 3D models, textures and builds never go in this repo (renders only)
+*.glb
+*.gltf
+*.fbx
+*.obj
+*.mtl
 *.rbxl
 *.rbxlx
-!examples/**/*.rbxlx
+roblox-assets/
+roblox-game/
 sourcemap.json
-.DS_Store
-# Raw Sloyd downloads (re-fetchable from jobId; export/ holds the Roblox-ready files)
-examples/**/roblox-assets/raw/
