@@ -5,27 +5,31 @@ description: Use when the user is importing models into Roblox Studio or setting
 
 # Studio Importer
 
+> **Script paths:** `<skills>` below means the folder this skill is installed in, the parent of this `SKILL.md`'s folder (for example `.agents/skills` or `.claude/skills`). All Roblox Studio Team skills sit side by side there. On Windows, use `python` instead of `python3`.
+
 You walk the user through Studio, because you can't click in it for them. Give exact menu paths and values, one step at a time, and say what they should see after each step. Sloyd's direct Roblox upload and Studio plugin queue need a signed-in Sloyd web account, not an API key. For API users that path is "coming soon", so use the manual import below.
 
-Reference: `${CLAUDE_PLUGIN_ROOT}/skills/studio-importer/references/roblox-reference.md`.
+Reference: `<skills>/studio-importer/references/roblox-reference.md`.
 
 ## A. Open the place
 
-Option 1, Rojo (recommended, keeps code in git):
-1. Install Rokit (github.com/rojo-rbx/rokit), then run `rokit install` inside `roblox-game/`. Or install Rojo 7.7.x another way.
-2. In Studio, install the **Rojo** plugin from the Creator Store (match the CLI version).
-3. `rojo build default.project.json -o SloydGame.rbxlx`, then open `SloydGame.rbxlx` in Studio. Save it to Roblox with File → Publish to Roblox.
-4. For live editing, run `rojo serve` in `roblox-game/`, then Plugins → Rojo → **Connect**. Code edits now sync into Studio. Rojo manages `ReplicatedStorage.Shared`, `ServerScriptService.Server` and `StarterPlayerScripts.Client`; it leaves `ReplicatedStorage.Assets` alone (`$ignoreUnknownInstances`).
+Start here (no extra tools):
+1. If `roblox-game/SloydGame.rbxlx` doesn't exist yet, run `python3 <skills>/luau-scripter/scripts/build_place.py roblox-game`. It downloads Rojo by itself if needed.
+2. Open `roblox-game/SloydGame.rbxlx` in Roblox Studio (double-click it, or File → Open from File). Save it to Roblox with File → Publish to Roblox.
+3. To change code later without Rojo, edit the scripts in Studio.
 
-Option 2, no Rojo: open the `.rbxlx` that luau-scripter built. To change code later, edit the scripts in Studio.
+Live sync with Rojo (optional, keeps code in git):
+1. Install Rojo 7.7.x (rojo.space, or Rokit with `rokit install` inside `roblox-game/`).
+2. In Studio, install the **Rojo** plugin from the Creator Store (match the CLI version).
+3. Run `rojo serve` in `roblox-game/`, then Plugins → Rojo → **Connect**. Code edits now sync into Studio. Rojo manages `ReplicatedStorage.Shared`, `ServerScriptService.Server` and `StarterPlayerScripts.Client`; it leaves `ReplicatedStorage.Assets` alone (`$ignoreUnknownInstances`).
 
 Press **Play** now. The course works with placeholder blocks. That's expected.
 
 ## B. Import the models
 
-For each `roblox-assets/export/<Name>/<Name>.fbx` (FBX keeps embedded textures; `.glb` also works):
+All ready models are in `roblox-assets/import/` as FBX with embedded textures (each model's folder in `roblox-assets/export/<Name>/` also has `.glb` and `.obj`):
 
-1. **File → Import** (or Home → Import 3D), then select the file. You can multi-select.
+1. **File → Import** (or Home → Import 3D), open `roblox-assets/import/`, and select every file in it (Ctrl+A / Cmd+A).
 2. In the Importer:
    - **File Geometry → Scale Unit: Stud**. The exporter already wrote studs, so keep the default.
    - **File General → Set Pivot to Scene Origin: on** (default). The exporter put the origin at bottom-center.
@@ -39,7 +43,7 @@ If an asset faces the wrong way, rotate it 180° on Y in Studio. Don't re-export
 ## C. Register the assets
 
 1. Open **View → Command Bar**.
-2. Paste the contents of `roblox-game/studio/SetupImportedAssets.luau` (or `${CLAUDE_PLUGIN_ROOT}/skills/luau-scripter/templates/rojo-game/studio/SetupImportedAssets.luau` with `ROLES` edited), then press Enter.
+2. Paste the contents of `roblox-game/studio/SetupImportedAssets.luau` (or `<skills>/luau-scripter/templates/rojo-game/studio/SetupImportedAssets.luau` with `ROLES` edited), then press Enter.
 3. Output prints `moved N assets into ReplicatedStorage.Assets` and lists any missing names.
 
 The script sets **CollisionFidelity** per role: PreciseConvexDecomposition for platforms and the finish, Hull for checkpoints, shop and decor, Box for collectibles and cosmetics. It also anchors the props. Game scripts can't change CollisionFidelity, which is why this runs in Studio.

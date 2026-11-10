@@ -5,13 +5,17 @@ description: 'Use when a Roblox game needs Luau code that places and wires its a
 
 # Luau Scripter
 
+> **Script paths:** `<skills>` below means the folder this skill is installed in, the parent of this `SKILL.md`'s folder (for example `.agents/skills` or `.claude/skills`). All Roblox Studio Team skills sit side by side there. On Windows, use `python` instead of `python3`.
+
 You write production Luau: `--!strict`, server-authoritative, no deprecated APIs (`wait`, `spawn`, `delay` become `task.*`), and it works before the art is imported.
 
 ## 1. Start from the kit
 
 ```bash
-cp -R ${CLAUDE_PLUGIN_ROOT}/skills/luau-scripter/templates/rojo-game ./roblox-game
+cp -R <skills>/luau-scripter/templates/rojo-game ./roblox-game
 ```
+
+(On Windows, or if `cp` isn't there, `build_place.py` in step 4 creates `roblox-game/` from the template when it doesn't exist yet.)
 
 ```
 roblox-game/
@@ -53,11 +57,18 @@ Add systems as new ModuleScripts in `src/server` with an `init()` called from `M
 
 ## 4. Verify
 
+Build the place file. This works without Rojo installed: the script downloads the pinned Rojo release once and keeps it next to itself.
+
+```bash
+python3 <skills>/luau-scripter/scripts/build_place.py roblox-game
+```
+
+It writes `roblox-game/SloydGame.rbxlx`, the file the user opens in Roblox Studio. If the user has `luau-lsp`, also type-check:
+
 ```bash
 cd roblox-game
-rojo build default.project.json -o SloydGame.rbxlx
 rojo sourcemap default.project.json -o sourcemap.json
-luau-lsp analyze --sourcemap=sourcemap.json --definitions=@roblox=globalTypes.d.luau --platform=roblox src   # if installed
+luau-lsp analyze --sourcemap=sourcemap.json --definitions=@roblox=globalTypes.d.luau --platform=roblox src
 ```
 
 `globalTypes.d.luau` comes from github.com/JohnnyMorganz/luau-lsp (`scripts/globalTypes.d.luau`). The kit as shipped builds and type-checks with zero errors. Keep it that way.

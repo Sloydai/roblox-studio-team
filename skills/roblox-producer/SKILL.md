@@ -5,9 +5,11 @@ description: Use when the user wants a Roblox game built end to end in one reque
 
 # Roblox Producer
 
+> **Script paths:** `<skills>` below means the folder this skill is installed in, the parent of this `SKILL.md`'s folder (for example `.agents/skills` or `.claude/skills`). All Roblox Studio Team skills sit side by side there. On Windows, use `python` instead of `python3`.
+
 You run a small studio of six specialist skills, with sloyd-api as shared plumbing. Your job is sequencing, budget and hand-offs. Each specialist owns its files; you check each hand-off before starting the next stage.
 
-Load the sloyd-api skill first (credentials, credits, job loop, errors), and read `${CLAUDE_PLUGIN_ROOT}/skills/studio-importer/references/roblox-reference.md` (Roblox limits).
+Load the sloyd-api skill first (credentials, credits, job loop, errors), and read `<skills>/studio-importer/references/roblox-reference.md` (Roblox limits).
 
 ## Pipeline
 
@@ -24,16 +26,22 @@ Stages 3 and 4 can run while 2 is still polling, as long as you keep to 5 Sloyd 
 
 ## Procedure
 
-1. **Preflight** (no credits spent):
-   - Check that `SLOYD_CLIENT_ID` and `SLOYD_CLIENT_SECRET` are set, without printing them (sloyd-api, section 1). If the balance is 0, say so before planning.
-   - Check the Sloyd MCP tools are available (`get_credit_balance`). If not, tell the user to export `SLOYD_CLIENT_ID` / `SLOYD_CLIENT_SECRET` and restart Claude Code, or fall back to `${CLAUDE_PLUGIN_ROOT}/skills/sloyd-api/scripts/sloyd.py`.
-   - Check Blender 3.6+ is installed (`python3 ${CLAUDE_PLUGIN_ROOT}/skills/prop-modeler/scripts/roblox_mesh.py --help` then a `check` on any GLB, or ask). It's needed for decimation and FBX.
-   - Optional: Rojo 7.x (`rojo --version`). Without it, studio-importer gives the manual path.
+1. **Preflight** (no credits spent). Run this from the user's project folder:
+
+   ```bash
+   python3 <skills>/roblox-producer/scripts/check_setup.py
+   ```
+
+   It checks Python, that all 8 skills are installed, the Sloyd key and credits, Blender and (optionally) Rojo, and prints the exact fix for anything missing. It never prints the key.
+   - If the key line says `[missing]`, stop and tell the user to run `python3 <skills>/sloyd-api/scripts/sloyd.py setup` **themselves, in their own terminal** (it asks for the secret with hidden input). Never ask for the secret in chat.
+   - If Blender is missing, give them the download link from the output and wait. Blender is needed for every model.
+   - Rojo doesn't need installing: `build_place.py` downloads it when it builds the game. An installed Rojo is only needed for live sync.
+   - Sloyd calls: use the Sloyd MCP tools if they're connected. If not, run the same tool with `python3 <skills>/sloyd-api/scripts/sloyd.py tool <tool_name> '<json args>'`, and batches with `sloyd.py run plan.json`.
 2. **Design**: invoke game-designer. Show the user the design doc summary and the asset table.
-3. **Budget gate**: total the credits from `plan.json` (or `python3 ${CLAUDE_PLUGIN_ROOT}/skills/sloyd-api/scripts/sloyd.py estimate roblox-assets/plan.json`), call `get_credit_balance`, and show `jobs / credits / ~USD / balance`. Wait for an explicit yes. If the balance is short, offer a smaller plan: fewer decor types, or drop variants.
+3. **Budget gate**: total the credits from `plan.json` (or `python3 <skills>/sloyd-api/scripts/sloyd.py estimate roblox-assets/plan.json`), call `get_credit_balance`, and show `jobs / credits / ~USD / balance`. Wait for an explicit yes. If the balance is short, offer a smaller plan: fewer decor types, or drop variants.
 4. **Assets**: invoke prop-modeler. Then skin-variants and world-backdrop.
 5. **Gate**: every asset in `manifest.json` has `export.ready: true`. If not, fix it with prop-modeler (regenerate with a lower `targetFaceCount`, or re-run `roblox_mesh.py process` with a lower `--target-tris`). Never hand a model over 20,000 triangles to the importer.
-6. **Code**: invoke luau-scripter. Gate: `rojo build` succeeds; if `luau-lsp` is installed, `luau-lsp analyze` has no errors.
+6. **Code**: invoke luau-scripter. Gate: `build_place.py` writes `roblox-game/SloydGame.rbxlx`; if `luau-lsp` is installed, `luau-lsp analyze` has no errors.
 7. **Ship**: invoke studio-importer. Finish with a short report:
    - what was built (the game loop in one line)
    - asset table: name, role, triangles, studs, file

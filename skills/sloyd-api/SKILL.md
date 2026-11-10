@@ -5,6 +5,8 @@ description: Use first, before any other Roblox Studio Team skill calls Sloyd, a
 
 # Sloyd API: connection, credits and the job loop
 
+> **Script paths:** `<skills>` below means the folder this skill is installed in, the parent of this `SKILL.md`'s folder (for example `.agents/skills` or `.claude/skills`). All Roblox Studio Team skills sit side by side there. On Windows, use `python` instead of `python3`.
+
 Every role in the Roblox Studio Team spends real credits through this API: game-designer, prop-modeler, skin-variants and world-backdrop. This skill is the shared contract. It covers how to connect, how to price a request before running it, how to run a job to completion, and what to do when it fails.
 
 Source of truth: the Sloyd API docs (api-dashboard.sloyd.ai) and the live tool schemas on the MCP server. Never invent a tool or a parameter that isn't listed here or returned by `tools/list`.
@@ -13,26 +15,42 @@ Source of truth: the Sloyd API docs (api-dashboard.sloyd.ai) and the live tool s
 
 Each user creates their own key, and generations are billed to that user's prepaid credits.
 
-1. Sign in at https://api-dashboard.sloyd.ai, open **API Keys**, and click **Generate Key**.
-2. Copy the client secret immediately. It's shown once and can't be retrieved later.
-3. Buy credits under **Usage & Billing** (minimum $12 = 900 credits). A key with 0 credits authenticates, but every paid call returns 402.
-4. Export the pair in the shell that launches the agent:
+1. Sign in at https://api-dashboard.sloyd.ai, open **API Keys**, and click **Generate Key**. Copy the Client ID and the Client Secret. The secret is shown once.
+2. Buy credits under **Usage & Billing** (minimum $12 = 900 credits). A key with 0 credits authenticates, but every paid call returns 402.
+3. In a terminal in the game project folder, the user runs:
 
-```bash
-export SLOYD_CLIENT_ID="sok_live_..."
-export SLOYD_CLIENT_SECRET="..."
-```
+   ```bash
+   python3 <skills>/sloyd-api/scripts/sloyd.py setup
+   ```
+
+   It asks for the ID and the secret (hidden input), tests them, saves them to `.env` in the project and adds `.env` to `.gitignore`.
+
+Environment variables `SLOYD_CLIENT_ID` / `SLOYD_CLIENT_SECRET` also work and win over `.env`.
 
 Rules for the agent:
 
-- Read credentials only from `SLOYD_CLIENT_ID` and `SLOYD_CLIENT_SECRET`, or from a git-ignored `.env` in the project.
-- Never ask the user to paste a secret into chat. Never write it into a tracked file, a manifest, a log or a commit, and never echo it back.
-- If either variable is missing, stop and give the user the four steps above. Don't try to generate anything without them.
-- To check without printing anything secret: `[ -n "$SLOYD_CLIENT_ID" ] && echo set`.
+- **Check the key with `python3 <skills>/sloyd-api/scripts/sloyd.py check`**, run from the project folder. It reads the environment and `.env` and prints only `credentials: ok` and the balance. Don't check the environment variables alone: a key saved by `setup` lives in `.env`.
+- If `check` fails, stop. Tell the user to run the `setup` command above **themselves, in their own terminal**, then try again. Don't generate anything without a working key.
+- Never ask the user to paste a secret into chat, never read `.env` aloud, never write the key into a tracked file, a manifest, a log or a commit, and never echo it back.
 
 ## 2. Connect
 
-**Claude Code (MCP, preferred).** This plugin ships a `.mcp.json` that registers the hosted server with `${SLOYD_CLIENT_ID}` / `${SLOYD_CLIENT_SECRET}` from the environment. Installing the plugin is enough, as long as the variables are exported before `claude` starts. To add it by hand:
+**No setup needed: the bundled client.** `<skills>/sloyd-api/scripts/sloyd.py` uses only the Python standard library and reads the same key. `tool` calls any tool in the table below over plain HTTPS, with the same arguments and prices as the MCP server:
+
+```bash
+python3 <skills>/sloyd-api/scripts/sloyd.py check
+python3 <skills>/sloyd-api/scripts/sloyd.py tool generate_3d_from_text '{"prompt":"a gumdrop platform","topology":"triangles","targetFaceCount":3000,"textureResolution":"1k"}'
+python3 <skills>/sloyd-api/scripts/sloyd.py tool get_job '{"jobId":"<jobId>","wait":30}'
+python3 <skills>/sloyd-api/scripts/sloyd.py estimate roblox-assets/plan.json
+python3 <skills>/sloyd-api/scripts/sloyd.py run roblox-assets/plan.json --out roblox-assets
+```
+
+`run` takes a game-designer `plan.json` and runs every prop, skin variant and the skybox:
+- it keeps at most 5 jobs in flight
+- it saves each `jobId` to `run_state.json` as soon as it gets one, so a re-run resumes instead of paying twice
+- it writes `manifest.json`, and `sky/sky_job.json` for world-backdrop
+
+**The Sloyd MCP server (optional).** When the user installed the Claude Code plugin, or added the server by hand, the same tools appear as MCP tools. Use them when they're there. The plugin reads the key from the environment variables, not from `.env`. To add the server by hand:
 
 ```bash
 claude mcp add --transport http sloyd https://api.sloyd.ai/api/mcp \
@@ -40,25 +58,9 @@ claude mcp add --transport http sloyd https://api.sloyd.ai/api/mcp \
   --header "x-client-secret: $SLOYD_CLIENT_SECRET"
 ```
 
-Other clients (Cursor, VS Code, Claude Desktop via `mcp-remote`): see [references/clients.md](references/clients.md).
+Other clients (Cursor, VS Code, Claude Desktop via `mcp-remote`): see [references/clients.md](references/clients.md). The curl equivalents are in [references/rest-fallback.md](references/rest-fallback.md).
 
-**No MCP? Use the bundled client or curl.** `${CLAUDE_PLUGIN_ROOT}/skills/sloyd-api/scripts/sloyd.py` calls the same REST API with the Python standard library only.
-
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/skills/sloyd-api/scripts/sloyd.py balance
-python3 ${CLAUDE_PLUGIN_ROOT}/skills/sloyd-api/scripts/sloyd.py estimate roblox-assets/plan.json
-python3 ${CLAUDE_PLUGIN_ROOT}/skills/sloyd-api/scripts/sloyd.py run roblox-assets/plan.json --out roblox-assets
-python3 ${CLAUDE_PLUGIN_ROOT}/skills/sloyd-api/scripts/sloyd.py job <jobId> --wait
-```
-
-`run` takes a game-designer `plan.json` and runs every prop, skin variant and the skybox:
-- it keeps at most 5 jobs in flight
-- it saves each `jobId` to `run_state.json` as soon as it gets one, so a re-run resumes instead of paying twice
-- it writes `manifest.json`
-
-The curl equivalents are in [references/rest-fallback.md](references/rest-fallback.md).
-
-**Script paths.** Commands in these skills use `${CLAUDE_PLUGIN_ROOT}/skills/...`, which Claude Code replaces with the plugin's install folder. In other agents, replace it with the folder this repository was cloned into. Run the scripts from the user's project folder, because outputs go to the paths you pass in.
+**Script paths.** Commands use `<skills>/...`, the folder the skills are installed in. All scripts are Python 3.9+ with the standard library only. Run them from the user's project folder, because outputs go to the paths you pass in.
 
 ## 3. Tools (the complete list)
 

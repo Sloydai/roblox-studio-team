@@ -6,9 +6,9 @@ All files are in studs (1 unit = 1 stud) with a bottom-center pivot. Each was re
 
 ## Steps
 
-1. Studio > File > Import (or Home > Import 3D), then select the `.fbx` files.
+1. Studio > File > Import (or Home > Import 3D), open `roblox-assets/import/`, and select every `.fbx` file in it.
 2. In the Importer, keep **Scale Unit: Stud** and **Set Pivot to Scene Origin** on, and turn **Merge Meshes** on.
-3. View > Command Bar, then paste `skills/luau-scripter/templates/rojo-game/studio/SetupImportedAssets.luau`. It moves the models into `ReplicatedStorage.Assets` and sets CollisionFidelity per role.
+3. View > Command Bar, then paste `roblox-game/studio/SetupImportedAssets.luau`. It moves the models into `ReplicatedStorage.Assets` and sets CollisionFidelity per role.
 4. Asset Manager > Bulk Import the six `Skybox*.png` faces, then put the image ids in `GameConfig.Sky`.
 5. Press Play.
 

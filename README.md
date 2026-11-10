@@ -1,151 +1,263 @@
 # Roblox Studio Team
 
-A Roblox game studio for your coding agent. Describe your game once and get a playable Roblox place:
-- a design doc
-- custom 3D props that pass Roblox's limits
-- shop skins
-- a custom sky
-- Luau game code, ready for Rojo or for Studio directly
-
-Built for Roblox creators. Powered by the [Sloyd API](https://www.sloyd.ai/api).
+[Agent Skills](https://agentskills.io) that give your coding agent a small Roblox game studio. Describe your game in one line and get a playable Roblox place with your own 3D models, shop skins to sell and a custom sky, made with the [Sloyd API](https://www.sloyd.ai/api).
 
 ![7 candy obby props made by the Roblox Studio Team skills](examples/candy-climb/images/props-sheet.png)
 
-*A real run: 7 props, 3 backpack skins and a skybox for a candy obby, 11 Sloyd jobs for 245 credits (~$3.27), and all 10 meshes ready for Studio. [See the run](examples/candy-climb/).*
+```sh
+npx skills add Sloydai/roblox-studio-team --all
+```
+
+Works with Claude Code, Codex, Cursor, opencode, Kiro and GitHub Copilot. You need your own Sloyd API key and Blender (free). [Step-by-step install](#install) takes about 10 minutes.
+
+Made by [Sloyd](https://sloyd.ai). If it saves you a week of modelling, give it a star.
+
+Making a Roblox game means hunting the Toolbox for props that don't match, or modelling them yourself, then fighting the importer: models over the 20,000-triangle limit, the wrong size, sunk into the floor. These skills do that part for you, and write the game code around the models.
+
+## What it does
+
+1. **Designs the game.** It turns your idea into a one-page design and an asset list, and shows you the cost before spending anything.
+2. **Makes the 3D models.** Every prop in one matching style, made by Sloyd.
+3. **Makes them Roblox-ready.** Under the 20,000-triangle limit, sized in studs, sitting on the floor, with textures sized for Roblox. Every file is checked before you get it.
+4. **Makes skins you can sell.** New looks for the same item, with prices, wired into an in-game shop.
+5. **Makes a custom sky.** Six images, the right way round for Roblox.
+6. **Writes the game.** Luau code for the course, coins, checkpoints, saving and the shop, and a place file you can open in Studio.
+
+| Skill | Role |
+|---|---|
+| `roblox-producer` | Runs the whole thing from one request. Start here. |
+| `game-designer` | Design doc and asset list |
+| `prop-modeler` | 3D models that pass Roblox's limits |
+| `skin-variants` | Shop skins and prices |
+| `world-backdrop` | Custom Roblox sky |
+| `luau-scripter` | The game code (Rojo project) |
+| `studio-importer` | Step-by-step help in Roblox Studio |
+| `sloyd-api` | Shared setup: API key, credits, job polling, errors |
+
+## Real example
+
+We asked for "an obby in a candy world". [See the run.](examples/candy-climb/)
+
+- **Result:** 7 props, 3 backpack skins and a sky in one run, for 245 credits (about $3.27). All 10 models passed Roblox's limits on the first try.
+- **Shop skins:** one backpack, four looks (free, 15, 30 and 60 coins).
+
+![Backpack skins](examples/candy-climb/images/skins-sheet.png)
+
+## Install
+
+Takes about 10 minutes. Do the steps in order.
+
+### Before you start
+
+You need these six things. Check each one.
+
+| You need | Check it with | If it's missing |
+|---|---|---|
+| A coding agent, for example [Claude Code](https://docs.claude.com/en/docs/claude-code) | `claude --version` in a terminal | Install it from the link |
+| Node.js 18 or newer | `node --version` in a terminal | Download the LTS version from [nodejs.org](https://nodejs.org) |
+| Python 3.9 or newer | Mac/Linux: `python3 --version`<br>Windows: `python --version` | Download from [python.org](https://www.python.org/downloads/). On Windows, tick **Add python.exe to PATH** in the installer |
+| Blender (free) | Step 5 checks it for you | Download from [blender.org](https://www.blender.org/download/) and install it with the default settings |
+| Roblox Studio | You can open it | Download from [create.roblox.com](https://create.roblox.com/) |
+| A Sloyd account | | Sign up free at [sloyd.ai](https://www.sloyd.ai) |
+
+You never have to open Blender yourself. The skills use it in the background to get the models ready for Roblox.
+
+### Step 1. Open a terminal in your game project folder
+
+Make a new folder for your game if you don't have one. Every command below runs in this folder, for example:
+
+```sh
+cd ~/projects/my-roblox-game
+```
+
+On Windows: `cd C:\Users\you\projects\my-roblox-game`
+
+### Step 2. Install the skills
+
+```sh
+npx skills add Sloydai/roblox-studio-team --all
+```
+
+If it asks `Ok to proceed?`, type `y` and press Enter.
+
+✅ You should see **Done!** at the end, and a new `.agents/skills` folder in your project.
+
+### Step 3. Get your Sloyd API key
+
+1. Go to [api-dashboard.sloyd.ai](https://api-dashboard.sloyd.ai) and sign in.
+2. Open **API Keys** and click **Generate Key**.
+3. Keep that page open. You'll copy the **Client ID** and the **Client Secret** in the next step. The secret is only shown once.
+4. Open **Usage & Billing** and buy credits. The minimum is $12 for 900 credits, enough for about three small games.
+
+### Step 4. Save your key
+
+Mac/Linux:
+
+```sh
+python3 .agents/skills/sloyd-api/scripts/sloyd.py setup
+```
+
+Windows:
+
+```powershell
+python .agents\skills\sloyd-api\scripts\sloyd.py setup
+```
+
+It asks two questions:
+
+1. **Client ID:** paste it and press Enter.
+2. **Client Secret:** paste it and press Enter. Nothing appears on screen while you paste. That's normal.
+
+✅ You should see **Done. Your key works** and your credit balance.
+
+The key is saved in a `.env` file in your project, and `.env` is added to `.gitignore` so it never gets committed. Never paste the secret into the chat with your agent.
+
+### Step 5. Check everything
+
+Mac/Linux:
+
+```sh
+python3 .agents/skills/roblox-producer/scripts/check_setup.py
+```
+
+Windows:
+
+```powershell
+python .agents\skills\roblox-producer\scripts\check_setup.py
+```
+
+✅ You should see `[ok]` on every line and **All set.** at the end.
+
+If a line says `[missing]`, the line under it says exactly what to do. Do it, then run this step again.
+
+### Step 6. Start your agent in the same folder
+
+```sh
+claude
+```
+
+If your agent was already open, close it and start it again. Skills only load when the agent starts.
+
+### Step 7. Ask for your game
+
+Type this into your agent, changing the idea to yours:
+
+> Use roblox-producer to make an obby in a candy world.
+
+The agent shows you the design, the list of models and the cost, and **waits for your OK before it spends any credits.** Then it makes everything. That takes about 15 minutes.
+
+### Step 8. Open it in Roblox Studio
+
+When it's done, the agent walks you through Roblox Studio step by step. The short version:
+
+1. Open `roblox-game/SloydGame.rbxlx` in Roblox Studio and press **Play**. The game already works, with simple blocks where the models go.
+2. **File → Import**, open the `roblox-assets/import` folder, select all the files in it, and click **Import**.
+3. **View → Command Bar**, paste the contents of `roblox-game/studio/SetupImportedAssets.luau`, and press Enter.
+4. Press **Play** again. Your models are in the game.
+
+Stuck on any step? Ask your agent: *"Use studio-importer to help me import my models."*
+
+## If something goes wrong
+
+| What you see | What to do |
+|---|---|
+| `npx: command not found` or `node: command not found` | Install Node.js (see [Before you start](#before-you-start)), then close and reopen the terminal |
+| Windows: `npx.ps1 cannot be loaded because running scripts is disabled` | Use `npx.cmd skills add Sloydai/roblox-studio-team --all` instead |
+| `python3: command not found` (Mac/Linux) | Install Python from [python.org](https://www.python.org/downloads/), then reopen the terminal |
+| Windows: `python` opens the Microsoft Store | Install Python from [python.org](https://www.python.org/downloads/) and tick **Add python.exe to PATH** |
+| `can't open file ... sloyd.py` or `check_setup.py` | You're in the wrong folder. `cd` into your game project (Step 1), the one with `.agents` inside |
+| `Sloyd rejected this key` | Copy the ID and secret again from the API Keys page and rerun Step 4. If you lost the secret, generate a new key |
+| `[missing] Sloyd credits` or `402 insufficient credits` | Buy credits under **Usage & Billing** on [api-dashboard.sloyd.ai](https://api-dashboard.sloyd.ai) |
+| `[missing] Blender: not found` | Install Blender from [blender.org](https://www.blender.org/download/) with the default settings, then rerun Step 5 |
+| Blender is installed but still not found | You installed it somewhere unusual. Set `BLENDER` to the full path of the Blender program, for example `export BLENDER=/Applications/Blender.app/Contents/MacOS/Blender` (Mac) or `$env:BLENDER="D:\Blender\blender.exe"` (Windows PowerShell), then rerun Step 5 |
+| The agent doesn't know `roblox-producer` | Restart the agent from your project folder (Step 6) |
+| A model imports huge, tiny or under the floor | In the Importer, keep **Scale Unit** on **Stud** and **Set Pivot to Scene Origin** on. Then ask the agent to use studio-importer |
+
+<details>
+<summary><b>Other ways to install</b></summary>
+
+**As a Claude Code plugin.** This also connects the Sloyd MCP server. In Claude Code:
 
 ```
 /plugin marketplace add Sloydai/roblox-studio-team
 /plugin install roblox-studio@sloyd-roblox-studio-team
 ```
 
-## The team
+The plugin's MCP server reads your key from environment variables, so set them in the terminal before you start `claude`:
 
-```
-roblox-studio/
-├── roblox-producer   runs the whole pipeline from one prompt, with budget gates
-├── game-designer     idea → design doc + plan.json (prompts, studs, triangle budgets, prices)
-├── prop-modeler      Sloyd 3D → under 20k triangles, studs, ground pivot, verified FBX/OBJ/GLB
-├── skin-variants     retexture → shop skins with a price ladder
-├── world-backdrop    Sloyd skybox → the six faces of a Roblox Sky
-├── luau-scripter     tested Rojo kit: course, collectibles, checkpoints, DataStore, shop, dev products
-├── studio-importer   3D Importer settings, CollisionFidelity, Rojo sync, playtest checklist
-└── sloyd-api         shared plumbing: credentials, credits, job polling, errors, REST fallback
+```sh
+export SLOYD_CLIENT_ID="sok_live_..."
+export SLOYD_CLIENT_SECRET="..."
 ```
 
-Each role hands its output to the next:
+On Windows PowerShell: `$env:SLOYD_CLIENT_ID="sok_live_..."` and `$env:SLOYD_CLIENT_SECRET="..."`. These only last until you close the terminal.
 
-1. game-designer writes `design-doc.md` and `plan.json`
-2. prop-modeler generates the props and writes `manifest.json` plus `export/<Name>/`
-3. skin-variants retextures the cosmetic and adds the skins to the manifest
-4. world-backdrop turns the skybox into `sky/Skybox*.png`
-5. luau-scripter fills `GameConfig.luau` from the manifest, and `rojo build` makes the place
-6. studio-importer walks you through import, Rojo and a playtest
+**By copying the folders.** Copy all 8 folders in [`skills/`](skills/) into your agent's skills folder, and keep them together because they call each other's scripts.
+
+| Agent | Project folder | User folder |
+| --- | --- | --- |
+| Claude Code | `.claude/skills/` | `~/.claude/skills/` |
+| Codex | `.agents/skills/` | `~/.agents/skills/` |
+| opencode | `.opencode/skills/` | `~/.config/opencode/skills/` |
+| Kiro | `.kiro/skills/` | `~/.kiro/skills/` |
+| GitHub Copilot | `.github/skills/` | |
+
+Then save your key and check your setup from your project folder, using that skills folder in the commands from Steps 4 and 5.
+
+**Connect the Sloyd MCP server (optional).** The skills work without it. Configs for Claude Code, Cursor, VS Code and other clients are in [`skills/sloyd-api/references/clients.md`](skills/sloyd-api/references/clients.md).
+
+**Rojo (optional).** You don't need to install it: the skills download it to build your game. Install [Rojo](https://rojo.space/docs/v7/getting-started/installation/) only if you want to edit the code in your own editor and sync it into Studio live. The agent explains the rest.
+
+</details>
 
 ## What you get
 
 ```
 roblox-assets/
-├── design-doc.md      pitch, loop, economy, art direction, asset table, cost
-├── plan.json          every asset: prompt, role, studs, triangle budget, collision; skins; sky
-├── manifest.json      every asset: jobIds, files, triangle counts, export checks
-├── export/<Name>/     <Name>.fbx .obj .glb + textures/ + <Name>.report.json
-├── previews/          renders of every asset
-└── sky/               SkyboxBk/Dn/Ft/Lf/Rt/Up.png, preview_cross.png, sky.json
-roblox-game/           Rojo project; `rojo build` → SloydGame.rbxlx
+├── design-doc.md      the game on one page
+├── plan.json          the asset list
+├── manifest.json      every model, job and file
+├── import/            every model as one .fbx, ready to import into Studio
+├── export/<Name>/     each model as .fbx .obj .glb, with its check report
+├── previews/          a picture of every model
+└── sky/               the six Roblox sky images
+roblox-game/           the game: open SloydGame.rbxlx in Roblox Studio
 ```
 
-## Setup
+Other things to ask:
 
-1. **Get your own Sloyd API key.** Each user brings their own credentials, and generations are billed to your prepaid credits.
-   1. Go to [api-dashboard.sloyd.ai](https://api-dashboard.sloyd.ai), open **API Keys**, and click **Generate Key**. Copy the secret; it's shown once.
-   2. Buy credits under **Usage & Billing**. The minimum is $12 for 900 credits.
-2. **Export the key** in the shell you start your agent from, or copy `.env.example` to a git-ignored `.env`.
-
-   ```bash
-   export SLOYD_CLIENT_ID="sok_live_..."
-   export SLOYD_CLIENT_SECRET="..."
-   ```
-
-3. **Install the plugin** (above). It registers Sloyd's hosted MCP server (`https://api.sloyd.ai/api/mcp`) using those two environment variables. To add the server by hand instead:
-
-   ```bash
-   claude mcp add --transport http sloyd https://api.sloyd.ai/api/mcp \
-     --header "x-client-id: $SLOYD_CLIENT_ID" \
-     --header "x-client-secret: $SLOYD_CLIENT_SECRET"
-   ```
-
-Other agents (Cursor, VS Code, Codex and others) can load the `skills/` folders directly. Clients without MCP can use the bundled standard-library Python client or curl (`skills/sloyd-api/references/rest-fallback.md`). Credentials are only read from the environment and never written to any file.
-
-## Example prompts
-
-- `Make me a Roblox obby in a candy world. Budget 300 credits.`
-- `Design a pet simulator and give me the asset list with triangle budgets before spending anything.`
-- `Generate a treasure chest prop for Roblox, under 5,000 triangles, 4 studs tall.`
-- `This FBX is 60k triangles. Make it import into Studio.`
-- `Give my backpack Mint, Chocolate and Galaxy skins and put them in the shop for 15, 30 and 60 coins.`
-- `Make a sunset sky for my game and set it up as a Roblox Sky.`
-- `Add a tycoon dropper system to my Rojo project.`
-- `Walk me through importing these FBX files and setting up Rojo.`
+- `Design a pet simulator and show me the asset list before spending anything.`
+- `Make a treasure chest for my Roblox game, about 4 studs tall.`
+- `This FBX is 60k triangles. Make it import into Roblox Studio.`
+- `Give my backpack mint, chocolate and galaxy skins for 15, 30 and 60 coins.`
+- `Make a sunset sky for my game.`
+- `Add a tycoon dropper to my game.`
 
 ## Cost
 
-Sloyd API credits ($1 = 75 credits). The agent always shows the estimate and your balance before spending.
+Sloyd API credits, at 75 credits per $1. The agent always shows the estimate and your balance before spending.
 
 | Step | Credits |
 |---|---|
-| Text to 3D (textured) | 25 |
-| Image to 3D (textured) | 20 |
-| Concept image | 10 |
-| Shop skin (retexture) | 15 |
-| Skybox | 25 |
-| Split into parts | 40 |
+| 3D model | 25 |
+| Shop skin | 15 |
+| Sky | 25 |
+| Concept image (optional) | 10 |
 
-The launch game was planned at 245 credits (7 props, 3 skins, 1 sky) and came in at exactly 245, with no failed jobs and no rerolls. Full breakdown: [examples/candy-climb](examples/candy-climb/README.md). Current prices: [sloyd.ai/api/pricing](https://www.sloyd.ai/api/pricing).
-
-## Roblox details the team handles
-
-- **20,000 triangles per MeshPart.** Each asset's budget is sent to Sloyd as `targetFaceCount`, and anything still over it is decimated in Blender. Vertices are welded first, so decimation can't open holes along UV seams. Every exported file is re-imported and checked.
-- **Textures sized by studs,** following Roblox's guidance: 256 px for about 5 studs, 512 for 10, 1024 for 20.
-- **Studs, not meters.** 1 unit = 1 stud, so the Importer's default Scale Unit (Stud) is right. FBX uses Roblox's Blender settings (Z forward, Y up, FBX Unit Scale).
-- **Ground pivot.** The origin is at bottom-center, so `PivotTo` puts props on the floor.
-- **CollisionFidelity by role.** PreciseConvexDecomposition for platforms, Hull for decor and Box for pickups. A Studio Command Bar script sets it, because game scripts can't.
-- **Sky orientation.** Uses the same face mapping as Sloyd's own Roblox cubemap export.
-- **Code that runs before the art exists.** The kit spawns sized placeholders until a model with the same name is in `ReplicatedStorage.Assets`.
-- **Safe saving and purchases.** A failed DataStore load never overwrites data, `BindToClose` flushes saves, and `ProcessReceipt` grants each purchase once.
-
-## Example: Candy Climb (candy obby)
-
-[`examples/candy-climb/`](examples/candy-climb/) is the real output of one run:
-
-- the design doc and the plan
-- a run record with the prompts, triangle counts, stud sizes, texture sizes and spend
-- renders of every prop and skin, and the sky as a cross preview
-- the Roblox `IMPORT.md` and the filled-in `GameConfig.luau`
-- the 3D models aren't included: run the plan with your own Sloyd key to make them
-
-## Requirements
-
-- Python 3.9+ for the helper scripts. The mesh and API scripts use the standard library only. The sky converter needs Pillow and NumPy (`skills/world-backdrop/scripts/requirements.txt`).
-- Blender 3.6+ (free), run headless for decimation and FBX export
-- A Sloyd API key with credits
-- Roblox Studio
-- Optional: Rojo 7.7 (`rokit install` in the Rojo project), and `luau-lsp` for type checks
-
-## Tests
-
-```bash
-BLENDER=/path/to/blender python3 -m unittest discover -s skills/prop-modeler/scripts -p "test_*.py" -v
-python3 -m unittest discover -s skills/world-backdrop/scripts -p "test_*.py" -v
-```
-
-- **Mesh tests** (need Blender): an 81k-triangle, 2048 px test sphere is decimated to 18,000 or fewer triangles, scaled to 6 studs and exported to FBX, OBJ and GLB. Each file is re-imported and checked for its triangle count, texture size and holes. Set `ROBLOX_TEST_MODEL=/path/to/model.glb` to also run the test on a real Sloyd model.
-- **Sky tests:** the panorama-to-faces conversion round-trips through a port of Sloyd's stitcher. Face directions and the Roblox mapping are checked too.
-
-The Luau kit builds with Rojo 7.7.1 and type-checks with `luau-lsp analyze` against the Roblox definitions, with 0 errors.
+A small game (7 models, 3 skins, 1 sky) is about 245 credits ($3.27). Current prices: [sloyd.ai/api/pricing](https://www.sloyd.ai/api/pricing).
 
 ## Coming soon
 
-Sloyd's web app has a Roblox avatar creator, selfie-to-Roblox-avatar and one-click upload to your Roblox account. These aren't available to public API keys yet, so this team doesn't use or imitate them. It makes props, worn cosmetics and skies.
+Sloyd's web app has a Roblox avatar creator, selfie-to-Roblox-avatar and one-click upload to your Roblox account. These aren't in the public API yet, so these skills don't use them. They make props, worn items and skies.
+
+## For contributors
+
+```sh
+python3 -m pip install -r tests/requirements.txt
+BLENDER=/path/to/blender python3 -m unittest discover -s tests -v
+```
+
+The tests cover decimation, export checks and the sky conversion. The Luau kit builds with Rojo 7.7 and type-checks with `luau-lsp` with 0 errors.
 
 ## Privacy
 
@@ -153,4 +265,4 @@ Prompts and images you send are processed by Sloyd. See the [Sloyd privacy polic
 
 ## License
 
-MIT
+[MIT](LICENSE)

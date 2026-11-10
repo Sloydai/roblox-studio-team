@@ -54,4 +54,4 @@ claude.ai and ChatGPT connectors that need OAuth sign-in aren't supported yet.
 
 ## Skills without a plugin
 
-Other agents can load the `skills/` folders directly. Replace `${CLAUDE_PLUGIN_ROOT}` in the commands with the folder this repository was cloned into.
+`npx skills add Sloydai/roblox-studio-team --all` installs the skills for most agents (Claude Code, Codex, Cursor, opencode, Kiro, GitHub Copilot). The commands in the skills use `<skills>`, which means the folder they were installed into. No MCP server is needed: `sloyd-api/scripts/sloyd.py tool <name> '<json>'` calls the same tools over plain HTTPS.

@@ -1,6 +1,6 @@
 """Tests for roblox_mesh.py.
 
-  BLENDER=/path/to/blender python3 -m unittest discover -s skills/prop-modeler/scripts -p "test_*.py" -v
+  BLENDER=/path/to/blender python3 -m unittest discover -s tests -v
 
 Mesh tests need Blender (set BLENDER or put `blender` on PATH); they are skipped without it.
 Set ROBLOX_TEST_MODEL=/path/to/model.glb (a real Sloyd model over 20,000 triangles) to also run
@@ -16,7 +16,7 @@ import tempfile
 import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-MESH = os.path.join(HERE, "roblox_mesh.py")
+MESH = os.path.join(HERE, "..", "skills", "prop-modeler", "scripts", "roblox_mesh.py")
 REAL_MODEL = os.environ.get("ROBLOX_TEST_MODEL")
 
 
@@ -125,6 +125,7 @@ class MeshPipelineTest(unittest.TestCase):
         self.assertTrue(exported["ready"])
         self.assertLessEqual(exported["triangles"], 4000)
         self.assertTrue(os.path.isfile(os.path.join(base, exported["files"]["fbx"])))
+        self.assertTrue(os.path.isfile(os.path.join(base, "import", "GumdropPlatform.fbx")))
 
     @unittest.skipUnless(REAL_MODEL and os.path.isfile(REAL_MODEL), "set ROBLOX_TEST_MODEL to a real Sloyd GLB")
     def test_real_sloyd_model(self):
