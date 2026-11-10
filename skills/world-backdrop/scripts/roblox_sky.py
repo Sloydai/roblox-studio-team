@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Turn a Sloyd skybox into the six images a Roblox `Sky` object needs.
 
-  roblox_sky.py --job get_job.json --out roblox-assets/sky        # from get_job output (preferred)
+  roblox_sky.py --job sky_job.json --out roblox-assets/sky        # from get_job output (preferred)
   roblox_sky.py --faces px.png nx.png py.png ny.png pz.png nz.png --out sky
   roblox_sky.py --panorama panorama.png --out sky                 # equirectangular fallback
 
@@ -11,18 +11,34 @@ Face order from Sloyd (`outputs.cubemapFaceUrls`): 0=+X, 1=-X, 2=+Y, 3=-Y, 4=+Z,
 The Roblox mapping, including the front/back swap and the up/down rotations, is the
 same one Sloyd's own "Roblox cubemap" export uses (Horizon, exportFormat.service.ts, v2).
 
-Requires: pillow, numpy (see requirements.txt).
+Nothing to install: it uses Pillow and NumPy when they're there, and otherwise runs itself
+inside Blender (which bundles NumPy and reads PNG, JPEG and WebP). Blender is found the
+same way as for prop-modeler: --blender, $BLENDER, PATH, or the default install folders.
 """
 
 import argparse
-import io
 import json
 import os
+import subprocess
 import sys
+import tempfile
 import urllib.request
 
-import numpy as np
-from PIL import Image
+try:
+    import bpy  # noqa: F401  (only inside Blender)
+
+    IN_BLENDER = True
+except ImportError:
+    IN_BLENDER = False
+
+try:
+    import numpy as np
+except ImportError:
+    np = None
+try:
+    from PIL import Image
+except ImportError:
+    Image = None
 
 ROBLOX_MAX_SKY = 1024
 
@@ -37,16 +53,76 @@ ROBLOX_FACES = [
 ]
 
 
+def _local_copy(src):
+    if not src.startswith("https://"):
+        return src, False
+    ext = os.path.splitext(src.split("?")[0])[1] or ".png"
+    fd, path = tempfile.mkstemp(suffix=ext)
+    with urllib.request.urlopen(src, timeout=120) as resp, os.fdopen(fd, "wb") as out:
+        out.write(resp.read())
+    return path, True
+
+
 def load_image(src):
-    if src.startswith("https://"):
-        with urllib.request.urlopen(src, timeout=120) as resp:
-            return Image.open(io.BytesIO(resp.read())).convert("RGB")
-    return Image.open(src).convert("RGB")
+    """Path or https URL -> HxWx3 uint8 array."""
+    path, temp = _local_copy(src)
+    try:
+        if Image is not None:
+            with Image.open(path) as im:
+                return np.asarray(im.convert("RGB"), dtype=np.uint8).copy()
+        img = bpy.data.images.load(path)
+        w, h = img.size
+        buf = np.empty(w * h * 4, dtype=np.float32)
+        img.pixels.foreach_get(buf)
+        bpy.data.images.remove(img)
+        arr = buf.reshape(h, w, 4)[::-1, :, :3]
+        return np.clip(np.round(arr * 255), 0, 255).astype(np.uint8)
+    finally:
+        if temp:
+            os.remove(path)
 
 
-def rotate_clockwise(img, degrees):
-    # PIL rotates counter-clockwise; sharp's rotate(90) (used by Sloyd) is clockwise.
-    return img.rotate(-degrees, expand=True) if degrees else img
+def save_image(arr, path):
+    if Image is not None:
+        Image.fromarray(arr).save(path)
+        return
+    h, w = arr.shape[:2]
+    rgba = np.ones((h, w, 4), dtype=np.float32)
+    rgba[:, :, :3] = arr[::-1].astype(np.float32) / 255
+    img = bpy.data.images.new(os.path.basename(path), w, h, alpha=False)
+    img.pixels.foreach_set(rgba.ravel())
+    img.filepath_raw = path
+    img.file_format = "PNG"
+    img.save()
+    bpy.data.images.remove(img)
+
+
+def resize(arr, size):
+    """Square resize with area averaging for downscales and bilinear for the rest."""
+    h, w = arr.shape[:2]
+    if (h, w) == (size, size):
+        return arr
+    a = arr.astype(np.float32)
+    k = min(h, w) // size
+    if k >= 2:  # box-filter down by an integer factor first, so nothing aliases
+        hh, ww = (h // k) * k, (w // k) * k
+        a = a[:hh, :ww].reshape(hh // k, k, ww // k, k, 3).mean(axis=(1, 3))
+        h, w = a.shape[:2]
+    ys = (np.arange(size) + 0.5) * h / size - 0.5
+    xs = (np.arange(size) + 0.5) * w / size - 0.5
+    y0 = np.clip(np.floor(ys).astype(int), 0, h - 1)
+    x0 = np.clip(np.floor(xs).astype(int), 0, w - 1)
+    y1, x1 = np.clip(y0 + 1, 0, h - 1), np.clip(x0 + 1, 0, w - 1)
+    fy = np.clip(ys - y0, 0, 1)[:, None, None]
+    fx = np.clip(xs - x0, 0, 1)[None, :, None]
+    top = a[y0][:, x0] * (1 - fx) + a[y0][:, x1] * fx
+    bot = a[y1][:, x0] * (1 - fx) + a[y1][:, x1] * fx
+    return np.clip(np.round(top * (1 - fy) + bot * fy), 0, 255).astype(np.uint8)
+
+
+def rotate_clockwise(arr, degrees):
+    # Matches sharp's rotate(90), which is clockwise.
+    return np.rot90(arr, k=-(degrees // 90)) if degrees else arr
 
 
 def faces_from_panorama(pano, size):
@@ -78,14 +154,14 @@ def faces_from_panorama(pano, size):
         y = (np.pi / 2 - lat) / np.pi * h  # top row = north pole
         xi = np.clip(np.floor(x).astype(int), 0, w - 1)
         yi = np.clip(np.floor(y).astype(int), 0, h - 1)
-        faces.append(Image.fromarray(src[yi, xi]))
+        faces.append(src[yi, xi])
     return faces
 
 
 def stitch_equirect(faces, out_w):
     """Python port of Sloyd's stitchEquirectangular, used to test the inverse above."""
-    size = faces[0].size[0]
-    raw = [np.asarray(f.resize((size, size)), dtype=np.uint8) for f in faces]
+    size = faces[0].shape[1]
+    raw = [resize(f, size) for f in faces]
     out_h = out_w // 2
     xs, ys = np.meshgrid(np.arange(out_w), np.arange(out_h))
     u = xs / out_w * 2 * np.pi - np.pi
@@ -109,25 +185,20 @@ def stitch_equirect(faces, out_w):
             px = np.clip(np.floor((fu * 0.5 + 0.5) * size), 0, size - 1).astype(int)
             py = np.clip(np.floor((fv * 0.5 + 0.5) * size), 0, size - 1).astype(int)
             out[mask] = raw[idx][py[mask], px[mask]]
-    return Image.fromarray(out)
+    return out
 
 
 def to_roblox(faces, size):
-    result = {}
-    for name, idx, rot in ROBLOX_FACES:
-        img = rotate_clockwise(faces[idx], rot)
-        if img.size != (size, size):
-            img = img.resize((size, size), Image.LANCZOS)
-        result[name] = img
-    return result
+    return {name: resize(rotate_clockwise(faces[idx], rot), size) for name, idx, rot in ROBLOX_FACES}
 
 
 def preview_cross(roblox_faces, tile=256):
     """Horizontal cross: Up above Ft, Dn below; row is Lf Ft Rt Bk."""
-    canvas = Image.new("RGB", (tile * 4, tile * 3), (11, 24, 51))
+    canvas = np.zeros((tile * 3, tile * 4, 3), dtype=np.uint8)
+    canvas[:] = (11, 24, 51)
     layout = {"SkyboxUp": (1, 0), "SkyboxLf": (0, 1), "SkyboxFt": (1, 1), "SkyboxRt": (2, 1), "SkyboxBk": (3, 1), "SkyboxDn": (1, 2)}
     for name, (cx, cy) in layout.items():
-        canvas.paste(roblox_faces[name].resize((tile, tile), Image.LANCZOS), (cx * tile, cy * tile))
+        canvas[cy * tile:(cy + 1) * tile, cx * tile:(cx + 1) * tile] = resize(roblox_faces[name], tile)
     return canvas
 
 
@@ -144,7 +215,28 @@ def faces_from_job(path):
     sys.exit("get_job output has neither 6 cubemapFaceUrls nor a panoramaUrl. Is the job done?")
 
 
+def find_blender(explicit=None):
+    here = os.path.dirname(os.path.abspath(__file__))
+    sys.path.insert(0, os.path.join(here, "..", "..", "prop-modeler", "scripts"))
+    from roblox_mesh import find_blender as find
+
+    return find(explicit)
+
+
+def run_in_blender(argv, explicit=None):
+    """No Pillow/NumPy here: rerun this script inside Blender, which has both covered."""
+    blender = find_blender(explicit)
+    cmd = [blender, "-b", "--factory-startup", "--python", os.path.abspath(__file__), "--"] + argv
+    proc = subprocess.run(cmd, capture_output=True, text=True)
+    for line in proc.stdout.splitlines():
+        if line.startswith("{"):
+            print(line)
+    if proc.returncode != 0 or '"ok": true' not in proc.stdout:
+        sys.exit("Sky conversion inside Blender failed:\n" + (proc.stdout + proc.stderr)[-1500:])
+
+
 def main():
+    argv = sys.argv[sys.argv.index("--") + 1:] if IN_BLENDER and "--" in sys.argv else sys.argv[1:]
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     src = p.add_mutually_exclusive_group(required=True)
     src.add_argument("--job", help="JSON file holding the get_job result of a finished skybox job")
@@ -152,7 +244,22 @@ def main():
     src.add_argument("--panorama", help="Equirectangular panorama (path or https URL)")
     p.add_argument("--out", required=True, help="Output directory")
     p.add_argument("--size", type=int, default=ROBLOX_MAX_SKY, help="Face size in px (max 1024)")
-    args = p.parse_args()
+    p.add_argument("--blender", help="Path to Blender, used only when Pillow/NumPy aren't installed")
+    args = p.parse_args(argv)
+    if not IN_BLENDER and (np is None or Image is None):
+        rest = [a for a in argv]
+        if args.blender:
+            i = rest.index("--blender")
+            del rest[i:i + 2]
+        for flag in ("--job", "--panorama", "--out"):
+            if flag in rest:
+                i = rest.index(flag) + 1
+                if not rest[i].startswith("https://"):
+                    rest[i] = os.path.abspath(rest[i])
+        if "--faces" in rest:
+            i = rest.index("--faces") + 1
+            rest[i:i + 6] = [x if x.startswith("https://") else os.path.abspath(x) for x in rest[i:i + 6]]
+        return run_in_blender(rest, args.blender)
 
     size = min(args.size, ROBLOX_MAX_SKY)
     source = None
@@ -171,8 +278,8 @@ def main():
     os.makedirs(args.out, exist_ok=True)
     roblox = to_roblox(faces, size)
     for name, img in roblox.items():
-        img.save(os.path.join(args.out, f"{name}.png"))
-    preview_cross(roblox).save(os.path.join(args.out, "preview_cross.png"))
+        save_image(img, os.path.join(args.out, f"{name}.png"))
+    save_image(preview_cross(roblox), os.path.join(args.out, "preview_cross.png"))
     manifest = {
         "source": source,
         "faceSize": size,
@@ -182,7 +289,8 @@ def main():
     }
     with open(os.path.join(args.out, "sky.json"), "w") as fh:
         json.dump(manifest, fh, indent=2)
-    print(json.dumps({"ok": True, "out": args.out, "source": source, "faceSize": size}))
+    backend = "blender" if Image is None else "pillow"
+    print(json.dumps({"ok": True, "out": args.out, "source": source, "faceSize": size, "backend": backend}))
 
 
 if __name__ == "__main__":

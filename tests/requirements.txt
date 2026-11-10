@@ -1,0 +1,3 @@
+# Only needed to run the tests. The skills themselves need nothing from pip.
+numpy>=1.24
+pillow>=10.0

@@ -5,9 +5,11 @@ description: Use when a Roblox game needs 3D props or cosmetics from Sloyd, or w
 
 # Prop Modeler
 
+> **Script paths:** `<skills>` below means the folder this skill is installed in, the parent of this `SKILL.md`'s folder (for example `.agents/skills` or `.claude/skills`). All Roblox Studio Team skills sit side by side there. On Windows, use `python` instead of `python3`.
+
 You produce Roblox-ready meshes. Generation is Sloyd's job; making them pass Roblox's limits is yours, and you verify every file.
 
-Load the sloyd-api skill first (credentials, credits, job loop, errors), and read `${CLAUDE_PLUGIN_ROOT}/skills/studio-importer/references/roblox-reference.md`.
+Load the sloyd-api skill first (credentials, credits, job loop, errors), and read `<skills>/studio-importer/references/roblox-reference.md`.
 
 ## Inputs
 
@@ -51,7 +53,7 @@ For each asset call `generate_3d_from_text` with:
 Requires Blender 3.6+ (free). The script finds it on PATH, at the default install location, or via `BLENDER=/path/to/blender`.
 
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/skills/prop-modeler/scripts/roblox_mesh.py batch roblox-assets/manifest.json
+python3 <skills>/prop-modeler/scripts/roblox_mesh.py batch roblox-assets/manifest.json
 ```
 
 For each asset this:
@@ -60,7 +62,7 @@ For each asset this:
 3. Scales to `heightStuds` (1 unit = 1 stud; leave the Importer's Scale Unit on **Stud**).
 4. Moves the pivot to bottom-center, so the model sits on the ground when placed.
 5. Downscales textures to Roblox's guidance for its size: 256 px for about 5 studs, 512 for 10, 1024 for 20.
-6. Exports `export/<Name>/<Name>.fbx` (embedded textures, Z forward / Y up / FBX Unit Scale, per Roblox's Blender guide), `.obj` + `.mtl` + `textures/`, and `.glb`.
+6. Exports `export/<Name>/<Name>.fbx` (embedded textures, Z forward / Y up / FBX Unit Scale, per Roblox's Blender guide), `.obj` + `.mtl` + `textures/`, and `.glb`. It also copies every ready FBX into one flat `roblox-assets/import/` folder, so the user can import them all into Studio at once.
 7. Re-imports every exported file in a clean Blender session and checks triangles, textures, size and open edges. Results go to `<Name>.report.json` and the asset's `export` block in the manifest.
 
 Single file: `roblox_mesh.py process <glb|url> --name <Name> --height-studs 4 --target-tris 3000`.
@@ -71,7 +73,7 @@ Audit any file: `roblox_mesh.py check model.fbx` (exit 1 if over the limits).
 Render previews and look at them before handing off:
 
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/skills/prop-modeler/scripts/roblox_mesh.py preview roblox-assets/export/<Name>/<Name>.glb --out roblox-assets/previews/<Name>.png
+python3 <skills>/prop-modeler/scripts/roblox_mesh.py preview roblox-assets/export/<Name>/<Name>.glb --out roblox-assets/previews/<Name>.png
 ```
 
 Reject and regenerate if the silhouette is wrong, a platform top isn't flat enough to stand on, or there are visible holes. If the report shows "open edges grew", raise `triBudget` for that asset.

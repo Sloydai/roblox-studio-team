@@ -5,6 +5,8 @@ description: 'Use when a Roblox item needs cosmetic or shop variants with the sa
 
 # Skin Variants
 
+> **Script paths:** `<skills>` below means the folder this skill is installed in, the parent of this `SKILL.md`'s folder (for example `.agents/skills` or `.claude/skills`). All Roblox Studio Team skills sit side by side there. On Windows, use `python` instead of `python3`.
+
 Cosmetics are how most Roblox games earn without being pay-to-win. Retexturing keeps the mesh, so every variant has the same silhouette, triangle count and fit as the base, and only the look changes.
 
 Load the sloyd-api skill first (credentials, credits, job loop, errors).
@@ -41,8 +43,8 @@ Poll `get_job` (`wait: 30`). Download `outputs.glbUrl` to `roblox-assets/raw/<Ba
 ## 3. Export and check
 
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/skills/prop-modeler/scripts/roblox_mesh.py batch roblox-assets/manifest.json --only <Base>_Mint,<Base>_Chocolate
-python3 ${CLAUDE_PLUGIN_ROOT}/skills/prop-modeler/scripts/roblox_mesh.py preview roblox-assets/export/<Base>_Mint/<Base>_Mint.glb --out roblox-assets/previews/<Base>_Mint.png
+python3 <skills>/prop-modeler/scripts/roblox_mesh.py batch roblox-assets/manifest.json --only <Base>_Mint,<Base>_Chocolate
+python3 <skills>/prop-modeler/scripts/roblox_mesh.py preview roblox-assets/export/<Base>_Mint/<Base>_Mint.glb --out roblox-assets/previews/<Base>_Mint.png
 ```
 
 Use the same `heightStuds` as the base so every skin attaches at the same offset.

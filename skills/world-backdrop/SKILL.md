@@ -5,6 +5,8 @@ description: Use when a Roblox game needs a custom sky or environment backdrop (
 
 # World Backdrop
 
+> **Script paths:** `<skills>` below means the folder this skill is installed in, the parent of this `SKILL.md`'s folder (for example `.agents/skills` or `.claude/skills`). All Roblox Studio Team skills sit side by side there. On Windows, use `python` instead of `python3`.
+
 The sky is the cheapest way to make a Roblox game look like its own place: one job, six images, no triangles.
 
 Load the sloyd-api skill first (credentials, credits, job loop, errors).
@@ -20,16 +22,15 @@ Avoid: characters, text, ground details under the player.
 
 `get_credit_balance` first, then `generate_skybox { "prompt": ..., "genStyleId": ... }`. If the user has reference art, upload it with `upload_image` and use `generate_skybox_from_image { "imageJobId": ... }`. For a tweak ("make it night"), use `edit_skybox { "jobId": ..., "prompt": ... }`.
 
-Poll `get_job` (`wait: 30`) until done. Save the full `get_job` result to `roblox-assets/sky/sky_job.json`.
+Poll `get_job` (`wait: 30`) until done. Save the full `get_job` result to `roblox-assets/sky/sky_job.json`. Without the MCP server, `python3 <skills>/sloyd-api/scripts/sloyd.py job <jobId> --wait > roblox-assets/sky/sky_job.json` does the same.
 
 ## 3. Convert to Roblox faces
 
 ```bash
-python3 -m venv "${CLAUDE_PLUGIN_DATA}/venv" && "${CLAUDE_PLUGIN_DATA}/venv/bin/pip" install -q -r ${CLAUDE_PLUGIN_ROOT}/skills/world-backdrop/scripts/requirements.txt
-"${CLAUDE_PLUGIN_DATA}/venv/bin/python" ${CLAUDE_PLUGIN_ROOT}/skills/world-backdrop/scripts/roblox_sky.py --job roblox-assets/sky/sky_job.json --out roblox-assets/sky
+python3 <skills>/world-backdrop/scripts/roblox_sky.py --job roblox-assets/sky/sky_job.json --out roblox-assets/sky
 ```
 
-(Skip the venv lines if Pillow and NumPy are already installed.)
+Nothing to install with pip: the script uses Pillow and NumPy if they're there, and otherwise runs itself inside Blender (the same Blender prop-modeler uses).
 
 - Uses `outputs.cubemapFaceUrls` (order +X, −X, +Y, −Y, +Z, −Z) with the same mapping as Sloyd's own Roblox cubemap export: front and back swapped, Up rotated 90° clockwise, Down 90° counter-clockwise.
 - Falls back to `outputs.panoramaUrl` (equirectangular) if faces are missing. That conversion is tested as an exact inverse of Sloyd's stitcher.

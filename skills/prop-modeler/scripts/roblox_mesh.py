@@ -37,26 +37,47 @@ ROBLOX_MAX_TEXTURE = 4096
 # Default decimation target leaves headroom under the hard limit.
 DEFAULT_TARGET = 18000
 
-BLENDER_CANDIDATES = {
-    "Darwin": ["/Applications/Blender.app/Contents/MacOS/Blender"],
-    "Windows": [
-        os.path.join(os.environ.get("ProgramFiles", r"C:\Program Files"), "Blender Foundation", v, "blender.exe")
-        for v in ("Blender 4.5", "Blender 4.4", "Blender 4.3", "Blender 4.2", "Blender 4.1", "Blender 4.0", "Blender 3.6")
-    ],
-    "Linux": ["/usr/bin/blender", "/snap/bin/blender", "/opt/blender/blender"],
-}
+def blender_candidates():
+    """Default install locations, newest version first. Covers Steam and the Microsoft Store too."""
+    import glob
+    import re
+
+    system = platform.system()
+    pats = []
+    if system == "Darwin":
+        pats = ["/Applications/Blender*.app/Contents/MacOS/Blender",
+                os.path.expanduser("~/Applications/Blender*.app/Contents/MacOS/Blender")]
+    elif system == "Windows":
+        for root in {os.environ.get("ProgramFiles", r"C:\Program Files"), os.environ.get("ProgramFiles(x86)", ""),
+                     os.environ.get("LOCALAPPDATA", "")}:
+            if root:
+                pats += [os.path.join(root, "Blender Foundation", "Blender*", "blender.exe"),
+                         os.path.join(root, "Programs", "Blender Foundation", "Blender*", "blender.exe"),
+                         os.path.join(root, "Steam", "steamapps", "common", "Blender", "blender.exe")]
+        pats.append(os.path.join(os.environ.get("LOCALAPPDATA", ""), "Microsoft", "WindowsApps", "blender*.exe"))
+    else:
+        pats = ["/usr/bin/blender", "/usr/local/bin/blender", "/snap/bin/blender", "/opt/blender*/blender",
+                os.path.expanduser("~/blender*/blender"), "/var/lib/flatpak/exports/bin/org.blender.Blender"]
+    found = []
+    for pat in pats:
+        found += [f for f in glob.glob(pat) if os.path.isfile(f)]
+
+    def version(path):
+        m = re.search(r"(\d+)\.(\d+)", path)
+        return (int(m.group(1)), int(m.group(2))) if m else (0, 0)
+
+    return sorted(set(found), key=version, reverse=True)
 
 
 def find_blender(explicit=None):
     for candidate in [explicit, os.environ.get("BLENDER"), shutil.which("blender")]:
         if candidate and os.path.isfile(candidate):
             return candidate
-    for candidate in BLENDER_CANDIDATES.get(platform.system(), []):
-        if os.path.isfile(candidate):
-            return candidate
+    for candidate in blender_candidates():
+        return candidate
     sys.exit(
-        "Blender not found. Install Blender 3.6+ (free, blender.org) or pass --blender /path/to/blender "
-        "or set BLENDER=/path/to/blender."
+        "Blender not found. Install Blender (free) from https://www.blender.org/download/ and run this again.\n"
+        "If it's installed somewhere unusual, set BLENDER to the full path of the Blender program."
     )
 
 
@@ -239,8 +260,16 @@ def cmd_batch(args):
         }
         if not result.get("roblox_ready"):
             failures += 1
+    # One flat folder with every ready FBX (textures embedded), so Studio can import them all at once.
+    import_dir = os.path.join(base, "import")
+    os.makedirs(import_dir, exist_ok=True)
+    for asset in manifest.get("assets", []):
+        fbx = (asset.get("export") or {}).get("files", {}).get("fbx")
+        if asset.get("export", {}).get("ready") and fbx:
+            shutil.copy(os.path.join(base, fbx), os.path.join(import_dir, os.path.basename(fbx)))
     with open(args.manifest, "w") as fh:
         json.dump(manifest, fh, indent=2)
+    print(f"\nReady to import into Roblox Studio: {import_dir}")
     return 1 if failures else 0
 
 

@@ -5,9 +5,11 @@ description: Use at the start of any Roblox build, before generating assets, whe
 
 # Game Designer
 
+> **Script paths:** `<skills>` below means the folder this skill is installed in, the parent of this `SKILL.md`'s folder (for example `.agents/skills` or `.claude/skills`). All Roblox Studio Team skills sit side by side there. On Windows, use `python` instead of `python3`.
+
 You design for Roblox players: mostly phones, short sessions, clear goals in the first 30 seconds, and a reason to come back (progress, cosmetics). Output two files the rest of the team builds from.
 
-Reference: `${CLAUDE_PLUGIN_ROOT}/skills/studio-importer/references/roblox-reference.md` for budgets, character size and jump reach.
+Reference: `<skills>/studio-importer/references/roblox-reference.md` for budgets, character size and jump reach.
 
 ## 1. Pick the loop
 

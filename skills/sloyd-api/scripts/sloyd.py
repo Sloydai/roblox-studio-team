@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
-"""Sloyd REST fallback for when the Sloyd MCP server is not connected. Standard library only.
+"""Sloyd client for agents without the Sloyd MCP server. Standard library only.
 
-Credentials come from SLOYD_CLIENT_ID / SLOYD_CLIENT_SECRET. Never pass them on the command line.
+Credentials come from SLOYD_CLIENT_ID / SLOYD_CLIENT_SECRET in the environment, or from a
+.env file in the current folder (written by `setup`). Never pass them on the command line.
 
+  sloyd.py setup                              # ask for the key, test it, save it to .env
+  sloyd.py check                              # "credentials: ok" and the balance, nothing secret
+  sloyd.py tool generate_3d_from_text '{"prompt": "a gumdrop platform"}'   # any Sloyd MCP tool
   sloyd.py balance
   sloyd.py estimate plan.json                 # credits a plan will cost vs. your balance
   sloyd.py text-to-3d "a gumdrop platform" --style Roblox --faces 4000 --texture 1k
@@ -26,6 +30,7 @@ import urllib.error
 import urllib.request
 
 API = os.environ.get("SLOYD_API_URL", "https://api.sloyd.ai/api")
+MCP_URL = os.environ.get("SLOYD_MCP_URL", "https://api.sloyd.ai/api/mcp")
 BUCKET = "https://storage.googleapis.com/ai-services-quality/jobs"
 MAX_CONCURRENT = 5
 
@@ -59,11 +64,116 @@ class SloydError(Exception):
         self.body = body
 
 
+def load_dotenv(path=".env"):
+    """Read SLOYD_* keys from .env in the current folder. Real environment variables win."""
+    if not os.path.isfile(path):
+        return
+    with open(path, encoding="utf-8") as fh:
+        for line in fh:
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, val = line.split("=", 1)
+            key = key.strip().removeprefix("export ").strip()
+            val = val.strip().strip('"').strip("'")
+            if key.startswith("SLOYD_") and val and not os.environ.get(key):
+                os.environ[key] = val
+
+
 def credentials():
-    cid, secret = os.environ.get("SLOYD_CLIENT_ID"), os.environ.get("SLOYD_CLIENT_SECRET")
+    load_dotenv()
+    cid = os.environ.get("SLOYD_CLIENT_ID", "").strip()
+    secret = os.environ.get("SLOYD_CLIENT_SECRET", "").strip()
     if not cid or not secret:
-        sys.exit("Set SLOYD_CLIENT_ID and SLOYD_CLIENT_SECRET (API Dashboard -> API Keys).")
+        sys.exit(
+            "No Sloyd API key found. In this folder, run:\n"
+            f"  {'python' if os.name == 'nt' else 'python3'} {sys.argv[0]} setup\n"
+            "(or set SLOYD_CLIENT_ID and SLOYD_CLIENT_SECRET)."
+        )
     return {"x-client-id": cid, "x-client-secret": secret}
+
+
+def mcp_tool(name, arguments):
+    """Call one Sloyd MCP tool over plain HTTPS and return its result payload."""
+    headers = credentials()
+    headers.update({"Content-Type": "application/json", "Accept": "application/json, text/event-stream"})
+    body = {"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": {"name": name, "arguments": arguments}}
+    req = urllib.request.Request(MCP_URL, data=json.dumps(body).encode(), method="POST", headers=headers)
+    try:
+        with urllib.request.urlopen(req, timeout=120) as resp:
+            raw = resp.read().decode()
+    except urllib.error.HTTPError as err:
+        raise SloydError(err.code, err.read().decode(errors="replace")) from None
+    payload = None
+    for line in raw.splitlines():
+        if line.startswith("data:"):
+            payload = json.loads(line[5:])
+    if payload is None:
+        payload = json.loads(raw)
+    if "error" in payload:
+        raise SloydError(None, payload["error"])
+    result = payload["result"]
+    if result.get("isError"):
+        text = " ".join(c.get("text", "") for c in result.get("content", []))
+        raise SystemExit(f"Sloyd tool error: {text}")
+    if "structuredContent" in result:
+        return result["structuredContent"]
+    text = "".join(c.get("text", "") for c in result.get("content", []))
+    try:
+        return json.loads(text)
+    except ValueError:
+        return {"text": text}
+
+
+def cmd_setup():
+    """Ask for the key, test it, save it to .env here, and keep .env out of git."""
+    import getpass
+
+    print("Paste your key from https://api-dashboard.sloyd.ai -> API Keys.")
+    cid = input("Client ID: ").strip().strip('"\'')
+    secret = getpass.getpass("Client Secret (hidden, nothing shows while you paste): ").strip().strip('"\'')
+    if not cid or not secret:
+        sys.exit("Both the Client ID and the Client Secret are needed. Run setup again.")
+    os.environ["SLOYD_CLIENT_ID"], os.environ["SLOYD_CLIENT_SECRET"] = cid, secret
+    try:
+        have = balance()
+    except SloydError as err:
+        if err.status == 401:
+            sys.exit("Sloyd rejected this key. Copy the Client ID and Client Secret again and rerun setup. "
+                     "If you lost the secret, generate a new key.")
+        raise
+    lines = []
+    if os.path.isfile(".env"):
+        with open(".env", encoding="utf-8") as fh:
+            lines = [l for l in fh.read().splitlines() if not l.strip().startswith(("SLOYD_CLIENT_ID", "SLOYD_CLIENT_SECRET"))]
+    lines += [f"SLOYD_CLIENT_ID={cid}", f"SLOYD_CLIENT_SECRET={secret}"]
+    with open(".env", "w", encoding="utf-8") as fh:
+        fh.write("\n".join(lines) + "\n")
+    ignored = False
+    if os.path.isfile(".gitignore"):
+        with open(".gitignore", encoding="utf-8") as fh:
+            ignored = any(l.strip() in (".env", "/.env", ".env*", ".env.*") for l in fh)
+    if not ignored:
+        with open(".gitignore", "a", encoding="utf-8") as fh:
+            fh.write("\n# Sloyd API key (never commit)\n.env\n")
+    print(f"\nDone. Your key works and is saved in {os.path.abspath('.env')}")
+    print(".env is in .gitignore, so it will not be committed.")
+    print(f"Credit balance: {have}")
+    if have < 25:
+        print("You need credits before you can generate: https://api-dashboard.sloyd.ai -> Usage & Billing.")
+    return 0
+
+
+def cmd_check():
+    try:
+        have = balance()
+    except SloydError as err:
+        if err.status == 401:
+            sys.exit("credentials: rejected. Run setup again with a working key.")
+        raise
+    print("credentials: ok")
+    print(f"balance: {have} credits")
+    return 0 if have > 0 else 1
 
 
 def request(method, path, body=None):
@@ -290,6 +400,10 @@ def cmd_run(args):
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="cmd", required=True)
+    sub.add_parser("setup", help="Ask for your key, test it, save it to .env")
+    sub.add_parser("check", help="Test the saved key and print the balance")
+    tl = sub.add_parser("tool", help="Call any Sloyd MCP tool by name with JSON arguments")
+    tl.add_argument("name"); tl.add_argument("arguments", nargs="?", default="{}")
     sub.add_parser("balance")
     e = sub.add_parser("estimate"); e.add_argument("plan")
     t = sub.add_parser("text-to-3d"); t.add_argument("prompt"); t.add_argument("--style", default="Auto")
@@ -301,7 +415,13 @@ def main():
     rn = sub.add_parser("run"); rn.add_argument("plan"); rn.add_argument("--out", default="roblox-assets")
     args = p.parse_args()
 
-    if args.cmd == "balance":
+    if args.cmd == "setup":
+        sys.exit(cmd_setup())
+    elif args.cmd == "check":
+        sys.exit(cmd_check())
+    elif args.cmd == "tool":
+        print(json.dumps(mcp_tool(args.name, json.loads(args.arguments)), indent=2))
+    elif args.cmd == "balance":
         print(json.dumps({"balance": balance()}))
     elif args.cmd == "estimate":
         sys.exit(cmd_estimate(args))

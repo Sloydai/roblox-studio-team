@@ -51,14 +51,24 @@ GameConfig.luau        the luau-scripter config filled in with this run's real s
 
 The 3D models, textures and sky faces aren't included. The renders are, so you can judge the quality. To make this game, or your own version of it, run the plan with your own Sloyd key. It costs 245 credits.
 
+First install the skills and save your key (the main README's [Install](../../README.md#install), Steps 1 to 5). Then, in your project folder, download the plan:
+
 ```bash
-mkdir -p roblox-assets && cp examples/candy-climb/plan.json roblox-assets/
-python3 skills/sloyd-api/scripts/sloyd.py estimate roblox-assets/plan.json
-python3 skills/sloyd-api/scripts/sloyd.py run roblox-assets/plan.json --out roblox-assets
-BLENDER=/path/to/blender python3 skills/prop-modeler/scripts/roblox_mesh.py batch roblox-assets/manifest.json
-python3 skills/world-backdrop/scripts/roblox_sky.py --job roblox-assets/sky/sky_job.json --out roblox-assets/sky
-cp -R skills/luau-scripter/templates/rojo-game roblox-game && cp examples/candy-climb/GameConfig.luau roblox-game/src/shared/
-(cd roblox-game && rojo build default.project.json -o SloydGame.rbxlx)
+mkdir -p roblox-assets && curl -fsSL -o roblox-assets/plan.json https://raw.githubusercontent.com/Sloydai/roblox-studio-team/main/examples/candy-climb/plan.json
 ```
 
-Or, in Claude Code: `/roblox-studio:roblox-producer build the plan in roblox-assets/plan.json`. Then follow [export/roblox/IMPORT.md](export/roblox/IMPORT.md).
+and ask your agent: *"Use roblox-producer to build the plan in roblox-assets/plan.json."*
+
+The same steps by hand:
+
+```bash
+python3 .agents/skills/sloyd-api/scripts/sloyd.py estimate roblox-assets/plan.json
+python3 .agents/skills/sloyd-api/scripts/sloyd.py run roblox-assets/plan.json --out roblox-assets
+python3 .agents/skills/prop-modeler/scripts/roblox_mesh.py batch roblox-assets/manifest.json
+python3 .agents/skills/world-backdrop/scripts/roblox_sky.py --job roblox-assets/sky/sky_job.json --out roblox-assets/sky
+python3 .agents/skills/luau-scripter/scripts/build_place.py roblox-game
+```
+
+Then copy this folder's `GameConfig.luau` over `roblox-game/src/shared/GameConfig.luau` (it has this run's real sizes) and run the last command again.
+
+Then follow [export/roblox/IMPORT.md](export/roblox/IMPORT.md) to bring the models into Roblox Studio.
